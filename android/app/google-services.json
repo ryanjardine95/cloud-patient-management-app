@@ -1,0 +1,54 @@
+{
+  "project_info": {
+    "project_number": "215525497072",
+    "project_id": "cloud-patient-management-app",
+    "storage_bucket": "cloud-patient-management-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:215525497072:android:e988e9deadb5a5fdd08a35",
+        "android_client_info": {
+          "package_name": "com.example.cloud_patient_management"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "215525497072-eh26fpmmnldn4ibu5eh8lmuor23iusm8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.cloud_patient_management",
+            "certificate_hash": "fc331381910e586f6cd5acb98f33d0baa1697f22"
+          }
+        },
+        {
+          "client_id": "215525497072-o422otgnr3n3dd2i6qgpasopki1i1rn4.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB7y-KkY3UG7tyyv1W7yqZzbh00mdwFHGg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "215525497072-o422otgnr3n3dd2i6qgpasopki1i1rn4.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "215525497072-jq10apo0kuedoskj6ktmo9ikft8g0616.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.cloudPatientManagement"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
