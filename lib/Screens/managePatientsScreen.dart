@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'patientDetailScreen.dart';
+import 'addPatientScreen.dart';
 
 class ManagePatients extends StatefulWidget {
   @override
@@ -11,6 +12,7 @@ class _ManagePatientsState extends State<ManagePatients> {
   @override
   Widget build(BuildContext context) {
     var devieConfig = MediaQuery.of(context).size;
+    int numberOfItems = 0;
     return Scaffold(
       appBar: AppBar(
         shape: RoundedRectangleBorder(
@@ -23,7 +25,10 @@ class _ManagePatientsState extends State<ManagePatients> {
         actions: [
           IconButton(
             icon: Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(PatientAddScreen.routeName,
+                  arguments: numberOfItems);
+            },
           ),
         ],
         centerTitle: true,
@@ -48,8 +53,9 @@ class _ManagePatientsState extends State<ManagePatients> {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return CircularProgressIndicator.adaptive();
                     }
-
                     var patientData = snapshot.data.docs;
+                    numberOfItems = patientData.length;
+                    print(numberOfItems);
 
                     return SizedBox(
                       width: devieConfig.width - 150,

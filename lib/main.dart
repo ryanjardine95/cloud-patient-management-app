@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Screens/patientDetailScreen.dart';
+import 'Screens/addPatientScreen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +23,8 @@ class MyApp extends StatelessWidget {
         accentColor: Colors.blueAccent
       ),
       routes: {
-        PatientDetailScreen.routeName : (ctx) => PatientDetailScreen()
+        PatientDetailScreen.routeName : (ctx) => PatientDetailScreen(),
+        PatientAddScreen.routeName: (ctx)=> PatientAddScreen(),
       },
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
