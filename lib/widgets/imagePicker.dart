@@ -26,7 +26,7 @@ class _ImagePickerClassState extends State<ImagePickerClass> {
               Navigator.of(context).pop();
               final pickedImage = await ImagePicker().getImage(
                 source: ImageSource.camera,
-                imageQuality: 60,
+                imageQuality: 80,
               );
               setState(() {
                 _image = File(pickedImage == null ? 'null' : pickedImage.path);

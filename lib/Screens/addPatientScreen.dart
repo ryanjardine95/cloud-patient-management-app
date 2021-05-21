@@ -27,13 +27,15 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   bool _isLoading = false;
   TextEditingController patientName = new TextEditingController();
   TextEditingController patientSurname = new TextEditingController();
-  TextEditingController patientCondion = new TextEditingController();
   TextEditingController patientAge = new TextEditingController();
+  TextEditingController patientcomorbidities = new TextEditingController();
+  TextEditingController patientTreatment = new TextEditingController();
+  List<String> patientcomorbiditiesList = [];
+  List<String> patientTreatmentList = [];
 
   final _formData = GlobalKey<FormState>();
 
   File _userImageFile = File('path');
-
   void _pickedIMage(File image) {
     setState(() {
       _userImageFile = image;
@@ -42,6 +44,9 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
 
   Future<void> _saveForm() async {
     setState(() {
+      patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
+      patientTreatmentList = patientTreatment.text.split(',').toList();
+
       numberOfPatiens = numberOfPatiens + 1;
       _isLoading = true;
     });
@@ -52,19 +57,19 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           .child(patientName.text + 'jpg');
 
       await ref.putFile(_userImageFile);
-
       final url = await ref.getDownloadURL();
+
       await FirebaseFirestore.instance
           .collection('Patient')
           .doc('Patient$numberOfPatiens')
           .set({
         'Name': patientName.text,
         'Surname': patientSurname.text,
-        'Condition': patientCondion.text,
-        'url': url,
+        'Url': url,
         'PatientId': 'Patient$numberOfPatiens',
         'Age': patientAge.text.toString(),
-        'Comorbidities': ''
+        'Comorbidities': patientcomorbiditiesList,
+        'Treatment': patientTreatmentList,
       });
     } catch (err) {}
     setState(() {
@@ -146,9 +151,9 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               return null;
                             },
                             textInputAction: TextInputAction.next,
-                            controller: patientCondion,
-                            decoration: InputDecoration(labelText: 'Condition'),
-                            keyboardType: TextInputType.name,
+                            controller: patientAge,
+                            decoration: InputDecoration(labelText: 'Age'),
+                            keyboardType: TextInputType.number,
                           ),
                         ),
                         Padding(
@@ -161,9 +166,30 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               return null;
                             },
                             textInputAction: TextInputAction.next,
-                            controller: patientCondion,
-                            decoration: InputDecoration(labelText: 'Age'),
-                            keyboardType: TextInputType.number,
+                            controller: patientcomorbidities,
+                            decoration: InputDecoration(
+                              labelText: 'Comorbidities',
+                              hintText: 'Please seperate using commas',
+                            ),
+                            keyboardType: TextInputType.text,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please enter valid Name';
+                              }
+                              return null;
+                            },
+                            textInputAction: TextInputAction.next,
+                            controller: patientTreatment,
+                            decoration: InputDecoration(
+                              labelText: 'Treatments',
+                              hintText: 'Please seperate using commas',
+                            ),
+                            keyboardType: TextInputType.text,
                           ),
                         ),
                       ],

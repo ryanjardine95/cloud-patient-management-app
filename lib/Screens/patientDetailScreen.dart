@@ -131,10 +131,12 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
           ],
         ),
       ),
-      floatingActionButton: IconButton(
-        icon: Icon(Icons.arrow_upward),
-        onPressed:  _scrollToTop,
-      ),
+      floatingActionButton: _showBackToTopButton
+          ? IconButton(
+              icon: Icon(Icons.arrow_upward),
+              onPressed: _scrollToTop,
+            )
+          : IconButton(icon: Icon(Icons.circle), onPressed: () {}),
     );
   }
 }
