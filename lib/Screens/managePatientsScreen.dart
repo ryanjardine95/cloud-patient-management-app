@@ -37,14 +37,14 @@ class _ManagePatientsState extends State<ManagePatients> {
       body: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
             SizedBox(height: devieConfig.height / 20),
             Text('#willBeASearchBar'),
             SizedBox(height: devieConfig.height / 20),
             Container(
-              padding: EdgeInsets.symmetric(horizontal: 110),
-              width: devieConfig.width,
+              
+              width: devieConfig.width - 5,
               child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Patient')

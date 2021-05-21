@@ -28,6 +28,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   TextEditingController patientName = new TextEditingController();
   TextEditingController patientSurname = new TextEditingController();
   TextEditingController patientCondion = new TextEditingController();
+  TextEditingController patientAge = new TextEditingController();
 
   final _formData = GlobalKey<FormState>();
 
@@ -61,6 +62,9 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         'Surname': patientSurname.text,
         'Condition': patientCondion.text,
         'url': url,
+        'PatientId': 'Patient$numberOfPatiens',
+        'Age': patientAge.text.toString(),
+        'Comorbidities': ''
       });
     } catch (err) {}
     setState(() {
@@ -145,6 +149,21 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                             controller: patientCondion,
                             decoration: InputDecoration(labelText: 'Condition'),
                             keyboardType: TextInputType.name,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please enter valid Name';
+                              }
+                              return null;
+                            },
+                            textInputAction: TextInputAction.next,
+                            controller: patientCondion,
+                            decoration: InputDecoration(labelText: 'Age'),
+                            keyboardType: TextInputType.number,
                           ),
                         ),
                       ],
