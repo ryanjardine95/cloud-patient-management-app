@@ -73,7 +73,6 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       patientTreatment = List.from(patientData['Treatment']);
       patientfileUrl = List.from(patientData['Url']);
     });
-    
   }
 
   @override
@@ -188,10 +187,12 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                   child: ListView.builder(
                     itemCount: patientfileUrl.length,
                     itemBuilder: (ctx, i) => Container(
-                      child: PatientFileViewer(
-                        tag: '${patientfileUrl[i]} tag',
-                        url: patientfileUrl[i],
-                      ),
+                      child: patientfileUrl[i] != ''
+                          ? PatientFileViewer(
+                              tag: '${patientfileUrl[i]} tag',
+                              url: patientfileUrl[i],
+                            )
+                          : null,
                     ),
                   ),
                 ),
