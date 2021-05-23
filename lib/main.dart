@@ -17,10 +17,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Cloud Patient Management',
       theme: ThemeData(
         primarySwatch: Colors.grey,
         accentColor: Colors.blueAccent
+        
       ),
       routes: {
         PatientDetailScreen.routeName : (ctx) => PatientDetailScreen(),
