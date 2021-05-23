@@ -5,23 +5,19 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_patient_management/widgets/imagePicker.dart';
 
-class PatientAddScreen extends StatefulWidget {
-  static const routeName = '/PatientAddScreen';
+class EditPatientScreen extends StatefulWidget {
+  static const routeName = '/EditPatientScreen';
+  final patientId;
+  EditPatientScreen({this.patientId});
   @override
-  _PatientAddScreenState createState() => _PatientAddScreenState();
+  _EditPatientScreenState createState() => _EditPatientScreenState();
 }
 
-class _PatientAddScreenState extends State<PatientAddScreen> {
-  int numberOfPatiens = 0;
+class _EditPatientScreenState extends State<EditPatientScreen> {
   @override
   void initState() {
     super.initState();
-    Future.delayed(Duration.zero, () {
-      setState(() {
-        var args = ModalRoute.of(context);
-        numberOfPatiens = args == null ? 0 : args.settings.arguments as int;
-      });
-    });
+    _getPatientData();
   }
 
   bool _isLoading = false;
@@ -32,6 +28,25 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   TextEditingController patientTreatment = new TextEditingController();
   List<String> patientcomorbiditiesList = [];
   List<String> patientTreatmentList = [];
+  var url = '';
+  Future<void> _getPatientData() async {
+    var firebase = await FirebaseFirestore.instance
+        .collection('Patient')
+        .doc(widget.patientId)
+        .get();
+    List<dynamic> comorbidities = firebase['Comorbidities'];
+    List<dynamic> treatment = firebase['Comorbidities'];
+    List<dynamic> _url = firebase['Comorbidities'];
+
+    setState(() {
+      patientName.text = firebase['Name'];
+      patientSurname.text = firebase['Surname'];
+      patientAge.text = firebase['Age'];
+      patientcomorbidities.text = comorbidities.join('');
+      patientTreatment.text = treatment.join('');
+      url = _url.join('');
+    });
+  }
 
   final _formData = GlobalKey<FormState>();
 
@@ -42,14 +57,11 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     });
   }
 
-  bool isVaild = false;
-
   Future<void> _saveForm() async {
     setState(() {
       patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
       patientTreatmentList = patientTreatment.text.split(',').toList();
 
-      numberOfPatiens = numberOfPatiens + 1;
       _isLoading = true;
     });
     try {
@@ -59,18 +71,15 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           .child(patientName.text + 'jpg');
 
       await ref.putFile(_userImageFile);
-      final String data = await ref.getDownloadURL();
-      final String url = '$data,';
-      final List<String> urls = url.split(',');
+      url = await ref.getDownloadURL();
 
       await FirebaseFirestore.instance
           .collection('Patient')
-          .doc('Patient$numberOfPatiens')
-          .set({
+          .doc(widget.patientId)
+          .update({
         'Name': patientName.text,
         'Surname': patientSurname.text,
-        'Url': urls,
-        'PatientId': 'Patient$numberOfPatiens',
+        'Url': url as List<String>,
         'Age': patientAge.text.toString(),
         'Comorbidities': patientcomorbiditiesList,
         'Treatment': patientTreatmentList,
@@ -110,7 +119,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                   ),
                   ImagePickerClass(_pickedIMage),
                   Form(
-                    autovalidateMode: AutovalidateMode.always,
                     key: _formData,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +127,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextFormField(
-                            autovalidateMode: AutovalidateMode.always,
                             validator: (value) {
                               if (value == null) {
                                 return 'Please enter valid Name';

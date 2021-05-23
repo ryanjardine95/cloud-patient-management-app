@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/addPatientScreen.dart';
 import 'package:flutter/material.dart';
 import 'patientDetailScreen.dart';
-import 'addPatientScreen.dart';
 
 class ManagePatients extends StatefulWidget {
   @override
@@ -11,7 +11,7 @@ class ManagePatients extends StatefulWidget {
 class _ManagePatientsState extends State<ManagePatients> {
   @override
   Widget build(BuildContext context) {
-    var deviceConfig = MediaQuery.of(context).size;
+    //var deviceConfig = MediaQuery.of(context).size;
     int numberOfItems = 0;
     return Scaffold(
       // appBar: AppBar(
@@ -66,6 +66,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                     ),
                     ),
                     InkWell(
+                      onTap: ()=> Navigator.of(context).pushNamed(PatientAddScreen.routeName),
                       child: Icon(
                           Icons.add,
                         color: Colors.blue,
