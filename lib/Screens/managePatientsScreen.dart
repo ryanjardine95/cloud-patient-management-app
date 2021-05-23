@@ -11,41 +11,92 @@ class ManagePatients extends StatefulWidget {
 class _ManagePatientsState extends State<ManagePatients> {
   @override
   Widget build(BuildContext context) {
-    var devieConfig = MediaQuery.of(context).size;
+    var deviceConfig = MediaQuery.of(context).size;
     int numberOfItems = 0;
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 50,
-        titleTextStyle: TextStyle(
-          fontSize: 15,
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.add),
-            onPressed: () {
-              Navigator.of(context).pushNamed(PatientAddScreen.routeName,
-                  arguments: numberOfItems);
-            },
-          ),
-        ],
-        centerTitle: true,
-        title: Text('Manage Patients'),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.max,
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            SizedBox(height: devieConfig.height / 20),
-            Text('#willBeASearchBar'),
-            SizedBox(height: devieConfig.height / 20),
-            Container(
-              
-              width: devieConfig.width - 5,
-              child: StreamBuilder(
+      // appBar: AppBar(
+      //   backgroundColor: Colors.white,
+      //   // shape: RoundedRectangleBorder(
+      //   //   borderRadius: BorderRadius.circular(20),
+      //   // ),
+      //   // elevation: 50,
+      //   // titleTextStyle: TextStyle(
+      //   //   fontSize: 15,
+      //   // ),
+      //   actions: [
+      //     IconButton(
+      //       icon: Icon(Icons.add),
+      //       onPressed: () {
+      //         Navigator.of(context).pushNamed(PatientAddScreen.routeName,
+      //             arguments: numberOfItems);
+      //       },
+      //     ),
+      //   ],
+      //   centerTitle: true,
+      //   title: Text('Manage Patients'),
+      // ),
+      body: Container(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 20.0),
+          child: Column(
+            //mainAxisSize: MainAxisSize.min,
+            //mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              SizedBox(
+                height: 10,
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    InkWell(
+                      child: Text("Dashboard",
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                          fontSize: 15.0,
+                        ),
+                      ),
+                    ),
+                    Text("Manage Patients",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20.0,
+                    ),
+                    ),
+                    InkWell(
+                      child: Icon(
+                          Icons.add,
+                        color: Colors.blue,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(
+                  height: 10,
+              ),
+                 Container(
+                   decoration: BoxDecoration(
+                     borderRadius: BorderRadius.circular(10.0),
+                     color: Colors.grey,
+                   ),
+                   width: MediaQuery.of(context).size.width,
+                  child: Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.search_rounded,
+                        ),
+                        Text("Search Patients"),
+                      ],
+                    ),
+                  ),
+                ),
+              StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Patient')
                       .snapshots(),
@@ -57,10 +108,12 @@ class _ManagePatientsState extends State<ManagePatients> {
                     numberOfItems = patientData.length;
                     print(numberOfItems);
 
-                    return SizedBox(
-                      width: devieConfig.width - 150,
-                      height: devieConfig.height - 100,
+                    return Padding(
+                      padding: EdgeInsets.all(0.0),
+                      //width: deviceConfig.width - 150,
+                      //height: deviceConfig.height - 40,
                       child: ListView.builder(
+                        shrinkWrap: true,
                           itemCount: patientData.length,
                           itemBuilder: (context, i) {
                             return Column(
@@ -78,6 +131,10 @@ class _ManagePatientsState extends State<ManagePatients> {
                                   child: ListTile(
                                     title: Text(
                                       '${patientData[i].data()['Surname']}, ${patientData[i].data()['Name']}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 20,
+                                      ),
                                     ),
                                   ),
                                 ),
@@ -86,7 +143,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                                   child: Divider(
                                     indent: 0.1,
                                     endIndent: 0.1,
-                                    height: 45,
+                                    height: 10,
                                     thickness: 2,
                                     color: Theme.of(context).primaryColor,
                                   ),
@@ -96,8 +153,8 @@ class _ManagePatientsState extends State<ManagePatients> {
                           }),
                     );
                   }),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

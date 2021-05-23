@@ -11,26 +11,25 @@ class DetailWidget extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Container(
-        height: deviceConfig.height / 6,
+        height: deviceConfig.height / 5,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Expanded(
-              child: Text(
-                sectionTitle,
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+            Text(
+              sectionTitle,
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            Expanded(
-              child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 50, ),
-                child: ListView.builder(
-                  itemCount: patientData.length,
-                  itemBuilder: (context, i) => Text(
-                    patientData[i],
+            Flexible(
+              child: ListView.builder(
+                itemCount: patientData.length,
+                itemBuilder: (context, i) => Text(
+                  patientData[i],
+                  style: TextStyle(
+                    fontSize: 20.0,
+                    color: Colors.blue,
                   ),
                 ),
               ),
