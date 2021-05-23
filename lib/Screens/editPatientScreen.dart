@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -35,7 +34,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
         .doc(widget.patientId)
         .get();
     List<dynamic> comorbidities = firebase['Comorbidities'];
-    List<dynamic> treatment = firebase['Comorbidities'];
+    List<dynamic> treatment = firebase['Treatment'];
     List<dynamic> _url = firebase['Comorbidities'];
 
     setState(() {
@@ -49,7 +48,6 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   }
 
   final _formData = GlobalKey<FormState>();
-
   File _userImageFile = File('path');
   void _pickedIMage(File image) {
     setState(() {
