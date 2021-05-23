@@ -1,9 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.cloud_patient_management">
-   <application
-        android:label="cloud_patient_management"
-        android:icon="@mipmap/ic_launcher">
+         <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" 
         android:requestLegacyExternalStorage="true"
+         />
+
+   <application
+        android:label="Cloud Patient Managment"
+        android:icon="@mipmap/cloud.png">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
