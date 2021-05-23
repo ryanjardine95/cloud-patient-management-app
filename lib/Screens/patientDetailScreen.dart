@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
 import 'package:cloud_patient_management/widgets/PatietntfileViewer.dart';
 import 'package:cloud_patient_management/widgets/detailWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -21,10 +22,11 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   bool _showBackToTopButton = false;
 
   ScrollController _scrollController = new ScrollController();
+  String patitentId = '';
+
   @override
   void initState() {
     super.initState();
-    String patitentId = '';
     _scrollController = ScrollController()
       ..addListener(() {
         setState(() {
@@ -71,6 +73,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       patientTreatment = List.from(patientData['Treatment']);
       patientfileUrl = List.from(patientData['Url']);
     });
+    
   }
 
   @override
@@ -116,23 +119,26 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                   Column(
-                     children: [
-                       Icon(Icons.face,
-                         size: 60.0,
-                       ),
-                       Text('$patientName $patientSurname')
-                     ],
-                   ),
                     Column(
                       children: [
-                        Text("Age",
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
+                        Icon(
+                          Icons.face,
+                          size: 60.0,
                         ),
+                        Text('$patientName $patientSurname')
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Age",
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
-                        Text("$patientAge",
+                        Text(
+                          "$patientAge",
                           style: TextStyle(
                             fontSize: 25.0,
                             color: Colors.blue,
@@ -142,8 +148,23 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                     ),
                     Column(
                       children: [
-                        Icon(Icons.edit,
-                          size: 40.0,
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) {
+                                  return EditPatientScreen(
+                                    patientId: patitentId,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            size: 40.0,
+                          ),
                           color: Colors.blue,
                         ),
                         Text('Edit Patient')
@@ -168,6 +189,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                     itemCount: patientfileUrl.length,
                     itemBuilder: (ctx, i) => Container(
                       child: PatientFileViewer(
+                        tag: '${patientfileUrl[i]} tag',
                         url: patientfileUrl[i],
                       ),
                     ),
@@ -182,9 +204,11 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
           ? IconButton(
               icon: Icon(Icons.arrow_upward),
               onPressed: _scrollToTop,
-        tooltip: "back up",
+              tooltip: "back up",
             )
-          : IconButton(icon: Icon(Icons.keyboard_return), onPressed: Navigator.of(context).pop),
+          : IconButton(
+              icon: Icon(Icons.keyboard_return),
+              onPressed: Navigator.of(context).pop),
     );
   }
 }
