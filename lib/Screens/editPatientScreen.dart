@@ -35,7 +35,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
         .doc(widget.patientId)
         .get();
     List<dynamic> comorbidities = firebase['Comorbidities'];
-    List<dynamic> treatment = firebase['Comorbidities'];
+    List<dynamic> treatment = firebase['Treatment'];
     List<dynamic> _url = firebase['Comorbidities'];
 
     setState(() {
