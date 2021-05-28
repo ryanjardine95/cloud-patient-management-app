@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -42,7 +41,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     });
   }
 
-  bool isVaild = false;
+  bool isValid = false;
 
   Future<void> _saveForm() async {
     setState(() {
@@ -64,8 +63,8 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       final List<String> urls = url.split(',');
 
       await FirebaseFirestore.instance
-          .collection('Patient')
-          .doc('Patient$numberOfPatiens')
+          .collection('Patients')
+          .doc('${patientName.text}')
           .set({
         'Name': patientName.text,
         'Surname': patientSurname.text,

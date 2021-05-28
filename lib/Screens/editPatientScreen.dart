@@ -72,7 +72,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
       url = await ref.getDownloadURL();
 
       await FirebaseFirestore.instance
-          .collection('Patient')
+          .collection('Patients')
           .doc(widget.patientId)
           .update({
         'Name': patientName.text,
@@ -101,7 +101,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
           fontSize: 15,
         ),
         centerTitle: true,
-        title: Text('Add Patients'),
+        title: Text('Edit ${widget.patientId}'),
       ),
       body: _isLoading
           ? SingleChildScrollView(

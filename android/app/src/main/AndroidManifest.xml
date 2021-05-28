@@ -5,8 +5,9 @@
          />
 
    <application
+       android:requestLegacyExternalStorage="true"
         android:label="Cloud Patient Managment"
-        android:icon="@mipmap/cloud.png">
+        android:icon="@mipmap/cloud">
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

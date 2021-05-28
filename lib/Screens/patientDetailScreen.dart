@@ -22,7 +22,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   bool _showBackToTopButton = false;
 
   ScrollController _scrollController = new ScrollController();
-  String patitentId = '';
+  String patientId = '';
 
   @override
   void initState() {
@@ -40,9 +40,10 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
     Future.delayed(Duration.zero, () {
       setState(() {
         var args = ModalRoute.of(context);
-        patitentId = args == null ? '' : args.settings.arguments.toString();
+        patientId = args == null ? '' : args.settings.arguments.toString();
       });
-      _getPatients(patitentId);
+      print(patientId);
+      _getPatients(patientId);
     });
   }
 
@@ -60,7 +61,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   var i = 0;
   Future<void> _getPatients(String patientId) async {
     final patientData = await FirebaseFirestore.instance
-        .collection('Patient')
+        .collection('Patients')
         .doc(patientId)
         .get();
     setState(() {
@@ -154,7 +155,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                               MaterialPageRoute(
                                 builder: (_) {
                                   return EditPatientScreen(
-                                    patientId: patitentId,
+                                    patientId: patientName,
                                   );
                                 },
                               ),

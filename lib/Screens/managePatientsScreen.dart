@@ -99,7 +99,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                 ),
               StreamBuilder(
                   stream: FirebaseFirestore.instance
-                      .collection('Patient')
+                      .collection('Patients')
                       .snapshots(),
                   builder: (context, AsyncSnapshot snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -125,7 +125,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                                     Navigator.of(context).pushNamed(
                                       PatientDetailScreen.routeName,
                                       arguments: patientData[i]
-                                          .data()['PatientId']
+                                          .data()['Name']
                                           .toString(),
                                     );
                                   },
