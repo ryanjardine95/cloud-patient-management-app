@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/addPatientReport.dart';
 import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
+import 'package:cloud_patient_management/widgets/NonListDetailWidget.dart';
 import 'package:cloud_patient_management/widgets/PatietntfileViewer.dart';
 import 'package:cloud_patient_management/widgets/detailWidget.dart';
 import 'package:flutter/cupertino.dart';
@@ -15,6 +17,12 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   String patientName = ' ';
   String patientSurname = '';
   String patientAge = '';
+  String patientComplaint = '';
+  String patientExamination = '';
+  String patientPlan = '';
+  String patientTests = '';
+  String patientAssesments = '';
+
   var patientComorbities = [];
   var patientTreatment = [];
   var patientfileUrl = [];
@@ -59,12 +67,17 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   }
 
   var i = 0;
-  Future<void> _getPatients(String patientId) async {
+  Future<void> _getPatients(String patientIds) async {
     final patientData = await FirebaseFirestore.instance
         .collection('Patients')
-        .doc(patientId)
+        .doc(patientIds)
         .get();
     setState(() {
+      patientAssesments = patientData['Assesments'];
+      patientTests = patientData['Tests'];
+      patientPlan = patientData['Plan'];
+      patientExamination = patientData['Examination'];
+      patientComplaint = patientData['Complaint'];
       patientName = patientData['Name'];
       patientSurname = patientData['Surname'];
       patientAge = patientData['Age'];
@@ -146,28 +159,57 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                         )
                       ],
                     ),
-                    Column(
+                    Row(
                       children: [
-                        IconButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) {
-                                  return EditPatientScreen(
-                                    patientId: patientName,
-                                  );
-                                },
+                        Column(
+                          children: [
+                            IconButton(
+                              icon: Icon(
+                                Icons.add,
+                                size: 40.0,
+                                color: Theme.of(context).accentColor,
                               ),
-                            );
-                          },
-                          icon: Icon(
-                            Icons.edit,
-                            size: 40.0,
-                          ),
-                          color: Colors.blue,
+                              onPressed: () => Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                      settings:
+                                          RouteSettings(name: '/PatientReport'),
+                                      builder: (context) => AddPatientReport(
+                                            patientName,
+                                            patientSurname,
+                                          ),
+                                      fullscreenDialog: false)),
+                              tooltip: "Add file",
+                            ),
+                            Text('Add File')
+                          ],
                         ),
-                        Text('Edit Patient')
+                        SizedBox(
+                          width: 7,
+                        ),
+                        Column(
+                          children: [
+                            IconButton(
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) {
+                                      return EditPatientScreen(
+                                        patientId: patientName,
+                                      );
+                                    },
+                                  ),
+                                );
+                              },
+                              icon: Icon(
+                                Icons.edit,
+                                size: 40.0,
+                              ),
+                              color: Colors.blue,
+                            ),
+                            Text('Edit Patient'),
+                          ],
+                        ),
                       ],
                     ),
                   ],
@@ -182,6 +224,26 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                 DetailWidget(
                   patientData: patientTreatment,
                   sectionTitle: 'Treatment',
+                ),
+                NonListDetailWidget(
+                  patientData: patientComplaint,
+                  sectionTitle: 'Complaint',
+                ),
+                NonListDetailWidget(
+                  patientData: patientExamination,
+                  sectionTitle: 'Examinations',
+                ),
+                NonListDetailWidget(
+                  patientData: patientPlan,
+                  sectionTitle: 'Plan',
+                ),
+                NonListDetailWidget(
+                  patientData: patientAssesments,
+                  sectionTitle: 'Assesments',
+                ),
+                    NonListDetailWidget(
+                  patientData: patientTests,
+                  sectionTitle: 'Tests',
                 ),
                 Container(
                   height: deviceConfig.height / 2,

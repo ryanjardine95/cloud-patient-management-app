@@ -19,14 +19,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cloud Patient Management',
-      theme: ThemeData(
-        primarySwatch: Colors.grey,
-        accentColor: Colors.blueAccent
-        
-      ),
+      theme:
+          ThemeData(primarySwatch: Colors.grey, accentColor: Colors.blue),
       routes: {
-        PatientDetailScreen.routeName : (ctx) => PatientDetailScreen(),
-        PatientAddScreen.routeName: (ctx)=> PatientAddScreen(),
+        PatientDetailScreen.routeName: (ctx) => PatientDetailScreen(),
+        PatientAddScreen.routeName: (ctx) => PatientAddScreen(),
       },
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
@@ -116,7 +113,9 @@ class _MyHomePageState extends State<MyHomePage> {
                 controller: emailController,
               ),
               TextFormField(
-                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                enableSuggestions: false,
+                keyboardType: TextInputType.text,
                 decoration: InputDecoration(
                     labelText: 'Password',
                     labelStyle: TextStyle(

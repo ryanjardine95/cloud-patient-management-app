@@ -11,8 +11,8 @@ class ManagePatients extends StatefulWidget {
 class _ManagePatientsState extends State<ManagePatients> {
   @override
   Widget build(BuildContext context) {
-    //var deviceConfig = MediaQuery.of(context).size;
     int numberOfItems = 0;
+
     return Scaffold(
       // appBar: AppBar(
       //   backgroundColor: Colors.white,
@@ -51,7 +51,8 @@ class _ManagePatientsState extends State<ManagePatients> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     InkWell(
-                      child: Text("Dashboard",
+                      child: Text(
+                        "Dashboard",
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: Colors.blue,
@@ -59,16 +60,18 @@ class _ManagePatientsState extends State<ManagePatients> {
                         ),
                       ),
                     ),
-                    Text("Manage Patients",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 20.0,
-                    ),
+                    Text(
+                      "Manage Patients",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20.0,
+                      ),
                     ),
                     InkWell(
-                      onTap: ()=> Navigator.of(context).pushNamed(PatientAddScreen.routeName),
+                      onTap: () => Navigator.of(context)
+                          .pushNamed(PatientAddScreen.routeName),
                       child: Icon(
-                          Icons.add,
+                        Icons.add,
                         color: Colors.blue,
                       ),
                     ),
@@ -76,27 +79,27 @@ class _ManagePatientsState extends State<ManagePatients> {
                 ),
               ),
               SizedBox(
-                  height: 10,
+                height: 10,
               ),
-                 Container(
-                   decoration: BoxDecoration(
-                     borderRadius: BorderRadius.circular(10.0),
-                     color: Colors.grey,
-                   ),
-                   width: MediaQuery.of(context).size.width,
-                  child: Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.search_rounded,
-                        ),
-                        Text("Search Patients"),
-                      ],
-                    ),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10.0),
+                  color: Colors.grey,
+                ),
+                width: MediaQuery.of(context).size.width,
+                child: Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.search_rounded,
+                      ),
+                      Text('Search'),
+                    ],
                   ),
                 ),
+              ),
               StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Patients')
@@ -114,7 +117,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                       //width: deviceConfig.width - 150,
                       //height: deviceConfig.height - 40,
                       child: ListView.builder(
-                        shrinkWrap: true,
+                          shrinkWrap: true,
                           itemCount: patientData.length,
                           itemBuilder: (context, i) {
                             return Column(

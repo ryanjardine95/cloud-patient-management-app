@@ -5,7 +5,8 @@ import 'package:image_picker/image_picker.dart';
 
 class ImagePickerClass extends StatefulWidget {
   final Function(File pickedImage) imagePickFn;
-  ImagePickerClass(this.imagePickFn);
+  
+  ImagePickerClass(this.imagePickFn,);
 
   @override
   _ImagePickerClassState createState() => _ImagePickerClassState();
@@ -67,7 +68,7 @@ class _ImagePickerClassState extends State<ImagePickerClass> {
     return Column(
       children: [
         SizedBox(height: 10),
-        Image.file(_image),
+       Image.file(_image),
         SizedBox(
           height: 10,
         ),

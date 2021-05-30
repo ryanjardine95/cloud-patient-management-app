@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:photo_view/photo_view.dart';
 
 class FullScreenFileViewer extends StatefulWidget {
   static const routeName = '/FullScreenFileViewer';
@@ -13,8 +14,7 @@ class FullScreenFileViewer extends StatefulWidget {
 }
 
 class _FullScreenFileViewerState extends State<FullScreenFileViewer> {
-
-   @override
+  @override
   initState() {
     SystemChrome.setEnabledSystemUIOverlays([]);
     super.initState();
@@ -26,17 +26,21 @@ class _FullScreenFileViewerState extends State<FullScreenFileViewer> {
     SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(),
       body: Center(
         child: GestureDetector(
           onDoubleTap: () => Navigator.of(context).pop(),
-                child: Hero(
-                  
+          child: Hero(
             tag: widget.tag,
-            child: CachedNetworkImage(
-              imageUrl: widget.url,
+            child: PhotoView(
+              imageProvider: CachedNetworkImageProvider(
+                
+                widget.url,
+              ),
             ),
           ),
         ),
