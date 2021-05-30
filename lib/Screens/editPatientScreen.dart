@@ -1,8 +1,5 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_patient_management/widgets/imagePicker.dart';
 
 class EditPatientScreen extends StatefulWidget {
   static const routeName = '/EditPatientScreen';
@@ -20,8 +17,6 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   }
 
   bool _isLoading = false;
-  TextEditingController patientName = new TextEditingController();
-  TextEditingController patientSurname = new TextEditingController();
   TextEditingController patientAge = new TextEditingController();
   TextEditingController patientcomorbidities = new TextEditingController();
   TextEditingController patientTreatment = new TextEditingController();
@@ -30,30 +25,28 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   var url = '';
   Future<void> _getPatientData() async {
     var firebase = await FirebaseFirestore.instance
-        .collection('Patient')
+        .collection('Patients')
         .doc(widget.patientId)
         .get();
     List<dynamic> comorbidities = firebase['Comorbidities'];
     List<dynamic> treatment = firebase['Treatment'];
-    List<dynamic> _url = firebase['Comorbidities'];
+    List<dynamic> _url = firebase['Url'];
 
     setState(() {
-      patientName.text = firebase['Name'];
-      patientSurname.text = firebase['Surname'];
       patientAge.text = firebase['Age'];
-      patientcomorbidities.text = comorbidities.join('');
-      patientTreatment.text = treatment.join('');
-      url = _url.join('');
+      patientcomorbidities.text = comorbidities.join(',');
+      patientTreatment.text = treatment.join(',');
+      url = _url.join("");
     });
   }
 
   final _formData = GlobalKey<FormState>();
-  File _userImageFile = File('path');
+  /* File _userImageFile = File('path');
   void _pickedIMage(File image) {
     setState(() {
       _userImageFile = image;
     });
-  }
+  } */
 
   Future<void> _saveForm() async {
     setState(() {
@@ -63,21 +56,18 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
       _isLoading = true;
     });
     try {
-      final ref = FirebaseStorage.instance
+      /* final ref = FirebaseStorage.instance
           .ref()
           .child('patients')
           .child(patientName.text + 'jpg');
 
       await ref.putFile(_userImageFile);
-      url = await ref.getDownloadURL();
+      url = await ref.getDownloadURL(); */
 
       await FirebaseFirestore.instance
           .collection('Patients')
           .doc(widget.patientId)
           .update({
-        'Name': patientName.text,
-        'Surname': patientSurname.text,
-        'Url': url as List<String>,
         'Age': patientAge.text.toString(),
         'Comorbidities': patientcomorbiditiesList,
         'Treatment': patientTreatmentList,
@@ -115,43 +105,13 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                   Padding(
                     padding: EdgeInsets.all(15),
                   ),
-                  ImagePickerClass(_pickedIMage),
+                  /* ImagePickerClass(_pickedIMage,), */
                   Form(
                     key: _formData,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textInputAction: TextInputAction.next,
-                            controller: patientName,
-                            decoration: InputDecoration(labelText: 'Name'),
-                            keyboardType: TextInputType.name,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textInputAction: TextInputAction.next,
-                            controller: patientSurname,
-                            decoration: InputDecoration(labelText: 'Surname'),
-                            keyboardType: TextInputType.name,
-                          ),
-                        ),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextFormField(

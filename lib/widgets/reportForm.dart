@@ -1,78 +1,43 @@
-import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_patient_management/widgets/imagePicker.dart';
 
-class PatientAddScreen extends StatefulWidget {
+class ReportForm extends StatefulWidget {
   static const routeName = '/PatientAddScreen';
+  final patientName;
+  ReportForm(this.patientName);
   @override
-  _PatientAddScreenState createState() => _PatientAddScreenState();
+  _ReportFormState createState() => _ReportFormState();
 }
 
-class _PatientAddScreenState extends State<PatientAddScreen> {
+class _ReportFormState extends State<ReportForm> {
   int numberOfPatiens = 0;
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration.zero, () {
-      setState(() {
-        var args = ModalRoute.of(context);
-        numberOfPatiens = args  == null  ? 0 : args.settings.arguments as int;
-      });
-    });
-  }
 
   bool _isLoading = false;
-  TextEditingController patientName = new TextEditingController();
-  TextEditingController patientSurname = new TextEditingController();
-  TextEditingController patientAge = new TextEditingController();
-  TextEditingController patientcomorbidities = new TextEditingController();
-  TextEditingController patientTreatment = new TextEditingController();
-  List<String> patientcomorbiditiesList = [];
-  List<String> patientTreatmentList = [];
+  TextEditingController patientComplaint = new TextEditingController();
+  TextEditingController patientExamination = new TextEditingController();
+  TextEditingController patientTests = new TextEditingController();
+  TextEditingController patientAssement = new TextEditingController();
+  TextEditingController patientPlan = new TextEditingController();
 
   final _formData = GlobalKey<FormState>();
-
-  File _userImageFile = File('path');
-  void _pickedIMage(File image) {
-    setState(() {
-      _userImageFile = image;
-    });
-  }
 
   bool isValid = false;
 
   Future<void> _saveForm() async {
     setState(() {
-      patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
-      patientTreatmentList = patientTreatment.text.split(',').toList();
-
       numberOfPatiens = numberOfPatiens + 1;
       _isLoading = true;
     });
     try {
-      final ref = FirebaseStorage.instance
-          .ref()
-          .child('patients')
-          .child(patientName.text + 'jpg');
-
-      await ref.putFile(_userImageFile);
-      final String data = await ref.getDownloadURL();
-      final String url = '$data,';
-      final List<String> urls = url.split(',');
-
       await FirebaseFirestore.instance
           .collection('Patients')
-          .doc('${patientName.text}')
-          .set({
-        'Name': patientName.text,
-        'Surname': patientSurname.text,
-        'Url': urls,
-        'PatientId': 'Patient$numberOfPatiens',
-        'Age': patientAge.text.toString(),
-        'Comorbidities': patientcomorbiditiesList,
-        'Treatment': patientTreatmentList,
+          .doc('${widget.patientName}')
+          .update({
+        'Complaint': patientComplaint.text,
+        'Examination': patientExamination.text,
+        'Tests': patientTests.text,
+        'Plan': patientPlan.text,
+        'Assesments': patientAssement.text
       });
     } catch (err) {}
     setState(() {
@@ -93,7 +58,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           fontSize: 15,
         ),
         centerTitle: true,
-        title: Text('Add Patients'),
+        title: Text('Add Report'),
       ),
       body: _isLoading
           ? SingleChildScrollView(
@@ -107,7 +72,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                   Padding(
                     padding: EdgeInsets.all(15),
                   ),
-                  ImagePickerClass(_pickedIMage,),
                   Form(
                     autovalidateMode: AutovalidateMode.always,
                     key: _formData,
@@ -125,10 +89,37 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
-                            textInputAction: TextInputAction.next,
-                            controller: patientName,
-                            decoration: InputDecoration(labelText: 'Name'),
-                            keyboardType: TextInputType.name,
+                            controller: patientAssement,
+                            decoration: InputDecoration(labelText: 'Assesment'),
+                            keyboardType: TextInputType.multiline,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please enter valid Name';
+                              }
+                              return null;
+                            },
+                            controller: patientComplaint,
+                            decoration: InputDecoration(labelText: 'Complaint'),
+                            keyboardType: TextInputType.multiline,
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          child: TextFormField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please enter valid Name';
+                              }
+                              return null;
+                            },
+                            controller: patientPlan,
+                            decoration: InputDecoration(labelText: 'Plan'),
+                            keyboardType: TextInputType.multiline,
                           ),
                         ),
                         Padding(
@@ -141,45 +132,14 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               return null;
                             },
                             textInputAction: TextInputAction.next,
-                            controller: patientSurname,
-                            decoration: InputDecoration(labelText: 'Surname'),
-                            keyboardType: TextInputType.name,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textInputAction: TextInputAction.next,
-                            controller: patientAge,
-                            decoration: InputDecoration(labelText: 'Age'),
-                            keyboardType: TextInputType.number,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textInputAction: TextInputAction.next,
-                            controller: patientcomorbidities,
+                            controller: patientTests,
                             decoration: InputDecoration(
-                              labelText: 'Comorbidities',
-                              hintText: 'Please seperate using commas',
+                              labelText: 'Tests',
                             ),
-                            keyboardType: TextInputType.text,
+                            keyboardType: TextInputType.multiline,
                           ),
                         ),
-                        Padding(
+                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextFormField(
                             validator: (value) {
@@ -189,12 +149,11 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               return null;
                             },
                             textInputAction: TextInputAction.next,
-                            controller: patientTreatment,
+                            controller: patientExamination,
                             decoration: InputDecoration(
-                              labelText: 'Treatments',
-                              hintText: 'Please seperate using commas',
+                              labelText: 'Examination',
                             ),
-                            keyboardType: TextInputType.text,
+                            keyboardType: TextInputType.multiline,
                           ),
                         ),
                       ],
