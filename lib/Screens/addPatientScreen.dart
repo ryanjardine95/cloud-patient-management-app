@@ -18,7 +18,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     Future.delayed(Duration.zero, () {
       setState(() {
         var args = ModalRoute.of(context);
-        numberOfPatiens = args  == null  ? 0 : args.settings.arguments as int;
+        numberOfPatiens = args == null ? 0 : args.settings.arguments as int;
       });
     });
   }
@@ -84,17 +84,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 50,
-        titleTextStyle: TextStyle(
-          fontSize: 15,
-        ),
-        centerTitle: true,
-        title: Text('Add Patients'),
-      ),
       body: _isLoading
           ? SingleChildScrollView(
               child: Center(
@@ -105,9 +94,26 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
               child: Column(
                 children: [
                   Padding(
+                    padding: EdgeInsets.all(30),
+                  ),
+                  Center(
+                    child: Text('Add Patient', style: TextStyle(fontSize: 20),),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 280,
+                    child: Divider(
+                      thickness: 2,
+                    ),
+                  ),
+                  Padding(
                     padding: EdgeInsets.all(15),
                   ),
-                  ImagePickerClass(_pickedIMage,),
+                  ImagePickerClass(
+                    _pickedIMage,
+                  ),
                   Form(
                     autovalidateMode: AutovalidateMode.always,
                     key: _formData,
@@ -125,6 +131,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientName,
                             decoration: InputDecoration(labelText: 'Name'),
@@ -140,6 +147,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientSurname,
                             decoration: InputDecoration(labelText: 'Surname'),
@@ -155,6 +163,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientAge,
                             decoration: InputDecoration(labelText: 'Age'),
@@ -170,6 +179,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientcomorbidities,
                             decoration: InputDecoration(
@@ -188,6 +198,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientTreatment,
                             decoration: InputDecoration(
@@ -201,8 +212,20 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     ),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 90, vertical: 8),
+                      textStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white),
+                    ),
                     onPressed: () => _saveForm(),
-                    child: Text('Done'),
+                    child: Text(
+                      'Done',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   )
                 ],
               ),

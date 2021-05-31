@@ -82,17 +82,6 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 50,
-        titleTextStyle: TextStyle(
-          fontSize: 15,
-        ),
-        centerTitle: true,
-        title: Text('Edit ${widget.patientId}'),
-      ),
       body: _isLoading
           ? SingleChildScrollView(
               child: Center(
@@ -102,6 +91,24 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
           : SingleChildScrollView(
               child: Column(
                 children: [
+                  Padding(
+                    padding: EdgeInsets.all(30),
+                  ),
+                  Center(
+                    child: Text(
+                      'Edit Patient',
+                      style: TextStyle(fontSize: 20),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 280,
+                    child: Divider(
+                      thickness: 2,
+                    ),
+                  ),
                   Padding(
                     padding: EdgeInsets.all(15),
                   ),
@@ -167,8 +174,20 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                     ),
                   ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 90, vertical: 8),
+                      textStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white),
+                    ),
                     onPressed: () => _saveForm(),
-                    child: Text('Done'),
+                    child: Text(
+                      'Done',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   )
                 ],
               ),
