@@ -49,17 +49,6 @@ class _ReportFormState extends State<ReportForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 50,
-        titleTextStyle: TextStyle(
-          fontSize: 15,
-        ),
-        centerTitle: true,
-        title: Text('Add Report'),
-      ),
       body: _isLoading
           ? SingleChildScrollView(
               child: Center(
@@ -70,7 +59,25 @@ class _ReportFormState extends State<ReportForm> {
               child: Column(
                 children: [
                   Padding(
-                    padding: EdgeInsets.all(15),
+                    padding: EdgeInsets.all(39),
+                  ),
+                  Center(
+                    child: Text(
+                      'Add Report From Template',
+                      style: TextStyle(fontSize: 15),
+                    ),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  Container(
+                    width: 280,
+                    child: Divider(
+                      thickness: 2,
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(20),
                   ),
                   Form(
                     autovalidateMode: AutovalidateMode.always,
@@ -89,8 +96,11 @@ class _ReportFormState extends State<ReportForm> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             controller: patientAssement,
-                            decoration: InputDecoration(labelText: 'Assesment'),
+                            decoration: InputDecoration(
+                              labelText: 'Assesment',
+                            ),
                             keyboardType: TextInputType.multiline,
                           ),
                         ),
@@ -103,8 +113,11 @@ class _ReportFormState extends State<ReportForm> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             controller: patientComplaint,
-                            decoration: InputDecoration(labelText: 'Complaint'),
+                            decoration: InputDecoration(
+                              labelText: 'Complaint',
+                            ),
                             keyboardType: TextInputType.multiline,
                           ),
                         ),
@@ -117,8 +130,11 @@ class _ReportFormState extends State<ReportForm> {
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             controller: patientPlan,
-                            decoration: InputDecoration(labelText: 'Plan'),
+                            decoration: InputDecoration(
+                              labelText: 'Plan',
+                            ),
                             keyboardType: TextInputType.multiline,
                           ),
                         ),
@@ -139,15 +155,17 @@ class _ReportFormState extends State<ReportForm> {
                             keyboardType: TextInputType.multiline,
                           ),
                         ),
-                         Padding(
+                        Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           child: TextFormField(
+                            textAlign: TextAlign.center,
                             validator: (value) {
                               if (value == null) {
                                 return 'Please enter valid Name';
                               }
                               return null;
                             },
+                            textAlignVertical: TextAlignVertical.center,
                             textInputAction: TextInputAction.next,
                             controller: patientExamination,
                             decoration: InputDecoration(
@@ -159,9 +177,24 @@ class _ReportFormState extends State<ReportForm> {
                       ],
                     ),
                   ),
+                  SizedBox(
+                    height: 100,
+                  ),
                   ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blue,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+                      textStyle: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.white),
+                    ),
                     onPressed: () => _saveForm(),
-                    child: Text('Done'),
+                    child: Text(
+                      'Done',
+                      style: TextStyle(color: Colors.white),
+                    ),
                   )
                 ],
               ),

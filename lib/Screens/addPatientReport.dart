@@ -16,7 +16,6 @@ class AddPatientReport extends StatefulWidget {
 
 class _AddPatientReportState extends State<AddPatientReport> {
   bool _hasChosen = false;
-  bool _templeate = true;
   bool _isLoading = false;
   bool _imagePicked = false;
 
@@ -79,10 +78,6 @@ class _AddPatientReportState extends State<AddPatientReport> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(
-            '${widget.patientName + " " + widget.patientSurname}\'s Report'),
-      ),
       body: _isLoading
           ? Center(
               child: CircularProgressIndicator.adaptive(),
@@ -93,24 +88,48 @@ class _AddPatientReportState extends State<AddPatientReport> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
+                      Padding(
+                        padding: EdgeInsets.all(39),
+                      ),
+                      Center(
+                        child: Text('Add next Page to File'),
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
+                        width: 280,
+                        child: Divider(
+                          thickness: 2,
+                        ),
+                      ),
+                      Padding(padding: EdgeInsets.all(65)),
                       Center(
                         child: ElevatedButton(
-                          style: ButtonStyle(),
+                          style: ElevatedButton.styleFrom(
+                            primary: Colors.blue,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 25, vertical: 10),
+                            textStyle: TextStyle(
+                                fontSize: 25,
+                                fontWeight: FontWeight.normal,
+                                color: Colors.white),
+                          ),
                           onPressed: () {
                             setState(() {
                               _hasChosen = true;
                             });
                           },
-                          child: Text('Page Template'),
+                          child: Text(
+                            'Page Template',
+                            style: TextStyle(color: Colors.white),
+                          ),
                         ),
                       ),
                       SizedBox(
-                        height: 10,
+                        height: 15,
                       ),
                       Text('Or'),
-                      SizedBox(
-                        height: 10,
-                      ),
                       ImagePickerClass(
                         _pickedIMage,
                       ),
