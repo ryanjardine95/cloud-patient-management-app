@@ -23,11 +23,11 @@ class _AddPatientReportState extends State<AddPatientReport> {
 
   File _userImageFile = File('path');
 
-  @override
-  void initState() {
-    super.initState();
-    _getImageUrl();
-  }
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _getImageUrl();
+  // }
 
   void _pickedImage(File image) {
     setState(() {
@@ -38,17 +38,18 @@ class _AddPatientReportState extends State<AddPatientReport> {
 
   var urls = [];
 
-  Future<void> _getImageUrl() async {
-    final data = await FirebaseFirestore.instance
-        .collection('Patients')
-        .doc('${widget.patientName}')
-        .get();
-    setState(() {
-      urls = List.from(
-        data['Url'],
-      );
-    });
-  }
+  // Future<void> _getImageUrl() async {
+  //   final data = await FirebaseFirestore.instance
+  //       .collection('Patients')
+  //       .doc('${widget.patientName}')
+  //   .collection('Files')
+  //       .get();
+  //   setState(() {
+  //     urls = List.from(
+  //       data['Url'],
+  //     );
+  //   });
+  // }
 
   Future<void> _saveImage() async {
     setState(() {
@@ -61,11 +62,11 @@ class _AddPatientReportState extends State<AddPatientReport> {
 
     await ref.putFile(_userImageFile);
     final String data = await ref.getDownloadURL();
-    final String stringUrl = '$data,';
-    urls.addAll(
-      stringUrl.split(',').toList(),
-    );
-    final List<dynamic> urL = urls;
+    final String stringUrl = '$data';
+    // urls.addAll(
+    //   stringUrl.split(',').toList(),
+    // );
+    // final List<dynamic> urL = urls;
     await FirebaseFirestore.instance
         .collection('Patients')
         .doc(
@@ -73,7 +74,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
         ).collection('File')
         .doc(DateTime.now().toString())
         .set({
-      'Url': urL,
+      'Url': stringUrl,
       'Author': FirebaseAuth.instance.currentUser!.email,
        'Time': DateTime.now(),
     });

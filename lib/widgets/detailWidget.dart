@@ -18,7 +18,7 @@ class DetailWidget extends StatelessWidget {
             Text(
               sectionTitle,
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -28,7 +28,7 @@ class DetailWidget extends StatelessWidget {
                 itemBuilder: (context, i) => Text(
                   patientData[i],
                   style: TextStyle(
-                    fontSize: 20.0,
+                    fontSize: 18.0,
                     color: Colors.blue,
                   ),
                 ),

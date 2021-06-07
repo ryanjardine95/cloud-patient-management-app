@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/addPatientReport.dart';
 import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
@@ -102,7 +103,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
         patientData['Comorbidities'],
       );
       patientFile = List.from(fileData.docs);
-      print(patientFile.length);
+      print(patientFile[0]["Url"]);
     });
   }
 
@@ -186,7 +187,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                               MaterialPageRoute(
                                 builder: (_) {
                                   return EditPatientScreen(
-                                    patientId: patientName,
+                                    patientId: patientId,
                                   );
                                 },
                               ),
@@ -217,61 +218,165 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                 Container(
                   height: deviceConfig.height / 2,
                   child: ListView.builder(
+                    reverse: true,
                     itemCount: patientFile.length,
                     itemBuilder: (context, i) {
-                      return Card(
-                      child:
-                      (){
-                        if(patientFile[i].get('Url') == ""){
+                      return Card(child: () {
+                        if (patientFile[i].get('Url') == "") {
                           return Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisSize: MainAxisSize.max,
                             children: [
-                              Text("${patientFile[i].get('Complaints')}"),
-                              Text("${patientFile[i].get('Examination')}"),
-                              Text("${patientFile[i].get('Tests')}"),
-                              Text("${patientFile[i].get('Assessments')}"),
-                              Text("${patientFile[i].get('Plan')}"),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text("Author: ${patientFile[i].get('Author')}"),
-                                  Text("Time: ${patientFile[i].get('Time')}"),
-                                ],
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Patient's complaint:",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text(
+                                      "${patientFile[i]['Complaints']}",
+                                      style: TextStyle(),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Patient's Examination:",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text("${patientFile[i]['Examination']}"),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10.0),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Patient's Tests:",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text("${patientFile[i]['Tests']}"),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Patient's Assessments:",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text("${patientFile[i]['Assessments']}"),
+                                  ],
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      "Patient's Plan:",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    Text("${patientFile[i]['Plan']}"),
+                                  ],
+                                ),
+                              ),
+                              Text(
+                                "Author: ${patientFile[i]['Author']}",
+                                style: TextStyle(fontStyle: FontStyle.italic),
+                              ),
+                              Text(
+                                "Time: ${patientFile[i]['Time']}",
+                                style: TextStyle(
+                                  fontStyle: FontStyle.italic,
+                                ),
                               ),
                               Text("Page $i"),
                             ],
                           );
-                        }else {
-                          return Column(
-                            children: [
-                              patientFile[i].get("Url")== null? CircularProgressIndicator():Image.network("${patientFile[i].get("Url")}"),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Text("Author: ${patientFile[i].get('Author')}"),
-                                  Text("Time: ${patientFile[i].get('Time')}"),
-                                ],
-                              ),
-                              Text("Page $i"),
-                            ],
+                        } else {
+                          return Padding(
+                            padding: const EdgeInsets.all(10.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                patientFile[i].get("Url") == null
+                                    ? CircularProgressIndicator()
+                                    : Image(
+                                        image: CachedNetworkImageProvider(
+                                            patientFile[i]["Url"])),
+                                // CachedNetworkImage(
+                                //   imageUrl: patientFile[i]["Url"],
+                                // ),
+                                Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    Text(
+                                      "Author: ${patientFile[i]["Author"]}",
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                    Text(
+                                      "Time: ${patientFile[i]["Time"]}",
+                                      style: TextStyle(
+                                        fontStyle: FontStyle.italic,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Text("Page $i"),
+                              ],
+                            ),
                           );
                         }
                       }()
-                      // Column(
-                      //   children: [
-                      //
-                      //     Text((){
-                      //       if(patientFile[i].get('Url') == ""){
-                      //         return "${patientFile[i].get('Assessments')}, ${patientFile[i].get("Time")}";
-                      //       }else{
-                      //         return "${patientFile[i].get('Url')}";
-                      //       }
-                      //     }()),
-                      //   //Text("${patientFile[i].get('Url')}"),
-                      //   ]
-                      // ),
-                    );
-                      },
+                          // Column(
+                          //   children: [
+                          //
+                          //     Text((){
+                          //       if(patientFile[i].get('Url') == ""){
+                          //         return "${patientFile[i].get('Assessments')}, ${patientFile[i].get("Time")}";
+                          //       }else{
+                          //         return "${patientFile[i].get('Url')}";
+                          //       }
+                          //     }()),
+                          //   //Text("${patientFile[i].get('Url')}"),
+                          //   ]
+                          // ),
+                          );
+                    },
                   ),
                 ),
               ],
@@ -287,7 +392,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
             )
           : IconButton(
               icon: Icon(Icons.keyboard_return),
-              onPressed: (){
+              onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => ManagePatients()),

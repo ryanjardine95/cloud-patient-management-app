@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/patientDetailScreen.dart';
 import 'package:flutter/material.dart';
 
 class EditPatientScreen extends StatefulWidget {
@@ -20,9 +21,11 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   TextEditingController patientAge = new TextEditingController();
   TextEditingController patientcomorbidities = new TextEditingController();
   TextEditingController patientTreatment = new TextEditingController();
-  List<String> patientcomorbiditiesList = [];
-  List<String> patientTreatmentList = [];
-  var url = '';
+  List<dynamic> patientComorbiditiesList = [];
+  List<dynamic> patientTreatmentList = [];
+
+  // var url = '';
+
   Future<void> _getPatientData() async {
     var firebase = await FirebaseFirestore.instance
         .collection('Patients')
@@ -30,14 +33,20 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
         .get();
     List<dynamic> comorbidities = firebase['Comorbidities'];
     List<dynamic> treatment = firebase['Treatment'];
-    List<dynamic> _url = firebase['Url'];
+    //List<dynamic> _url = firebase['Url'];
 
     setState(() {
-      patientAge.text = firebase['Age'];
+      patientAge.text = firebase['Age'].toString();
       patientcomorbidities.text = comorbidities.join(',');
+      patientComorbiditiesList = comorbidities;
       patientTreatment.text = treatment.join(',');
-      url = _url.join("");
+      patientTreatmentList = treatment;
+      //url = _url.join("");
     });
+    print(widget.patientId);
+    print(firebase['Comorbidities'].toString());
+    print(treatment.toString());
+    print(patientAge.text.toString());
   }
 
   final _formData = GlobalKey<FormState>();
@@ -50,7 +59,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
 
   Future<void> _saveForm() async {
     setState(() {
-      patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
+      patientComorbiditiesList = patientcomorbidities.text.split(',').toList();
       patientTreatmentList = patientTreatment.text.split(',').toList();
 
       _isLoading = true;
@@ -69,13 +78,16 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
           .doc(widget.patientId)
           .update({
         'Age': patientAge.text.toString(),
-        'Comorbidities': patientcomorbiditiesList,
+        'Comorbidities': patientComorbiditiesList,
         'Treatment': patientTreatmentList,
       });
     } catch (err) {}
     setState(() {
       _isLoading = false;
-      Navigator.of(context).pop();
+      Navigator.of(context).pushNamed(
+        PatientDetailScreen.routeName,
+        arguments: widget.patientId,
+      );
     });
   }
 
@@ -83,11 +95,11 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? SingleChildScrollView(
-              child: Center(
-                child: CircularProgressIndicator.adaptive(),
-              ),
-            )
+          ? SafeArea(
+                child: Center(
+                  child: CircularProgressIndicator.adaptive(),
+                ),
+          )
           : SingleChildScrollView(
               child: Column(
                 children: [
@@ -132,6 +144,7 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                             controller: patientAge,
                             decoration: InputDecoration(labelText: 'Age'),
                             keyboardType: TextInputType.number,
+                            //initialValue: patientAge.text,
                           ),
                         ),
                         Padding(
@@ -144,12 +157,14 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                               return null;
                             },
                             textInputAction: TextInputAction.next,
+                            //initialValue: patientcomorbiditiesList.toString(),
                             controller: patientcomorbidities,
                             decoration: InputDecoration(
                               labelText: 'Comorbidities',
                               hintText: 'Please seperate using commas',
                             ),
                             keyboardType: TextInputType.text,
+                            maxLines: 5,
                           ),
                         ),
                         Padding(
@@ -163,11 +178,13 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                             },
                             textInputAction: TextInputAction.next,
                             controller: patientTreatment,
+                            //initialValue: patientTreatmentList.toString(),
                             decoration: InputDecoration(
                               labelText: 'Treatments',
                               hintText: 'Please seperate using commas',
                             ),
                             keyboardType: TextInputType.text,
+                            maxLines: 5,
                           ),
                         ),
                       ],

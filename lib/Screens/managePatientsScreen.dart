@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/addPatientScreen.dart';
+import 'package:cloud_patient_management/Screens/dashboard.dart';
 import 'package:flutter/material.dart';
 import 'patientDetailScreen.dart';
 
@@ -12,6 +13,7 @@ class _ManagePatientsState extends State<ManagePatients> {
   @override
   Widget build(BuildContext context) {
     int numberOfItems = 0;
+    TextEditingController searchController = new TextEditingController();
 
     return Scaffold(
       // appBar: AppBar(
@@ -59,6 +61,9 @@ class _ManagePatientsState extends State<ManagePatients> {
                           fontSize: 15.0,
                         ),
                       ),
+                      onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> Dashboard() ));
+                      },
                     ),
                     Text(
                       "Manage Patients",
@@ -89,14 +94,10 @@ class _ManagePatientsState extends State<ManagePatients> {
                 width: MediaQuery.of(context).size.width,
                 child: Padding(
                   padding: const EdgeInsets.all(10.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.search_rounded,
-                      ),
-                      Text('Search'),
-                    ],
+                  child: TextFormField(
+                    initialValue: "Search ${Icon(Icons.search_rounded)}",
+                    //controller: searchController,
+
                   ),
                 ),
               ),
@@ -128,7 +129,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                                     Navigator.of(context).pushNamed(
                                       PatientDetailScreen.routeName,
                                       arguments: patientData[i]
-                                          .data()['Name']
+                                          .data()['ID']
                                           .toString(),
                                     );
                                   },
@@ -140,6 +141,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                                         fontSize: 20,
                                       ),
                                     ),
+                                    subtitle: Text("${patientData[i].data()["ID"]}"),
                                   ),
                                 ),
                                 SizedBox(
