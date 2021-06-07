@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_patient_management/widgets/imagePicker.dart';
@@ -35,7 +36,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   final _formData = GlobalKey<FormState>();
 
   File _userImageFile = File('path');
-  void _pickedIMage(File image) {
+  void _pickedImage(File image) {
     setState(() {
       _userImageFile = image;
     });
@@ -60,7 +61,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       await ref.putFile(_userImageFile);
       final String data = await ref.getDownloadURL();
       final String url = '$data,';
-      final List<String> urls = url.split(',');
+      //final List<String> urls = url.split(',');
 
       await FirebaseFirestore.instance
           .collection('Patients')
@@ -68,7 +69,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           .set({
         'Name': patientName.text,
         'Surname': patientSurname.text,
-        'Url': urls,
         'PatientId': 'Patient$numberOfPatiens',
         'Age': patientAge.text.toString(),
         'Comorbidities': patientcomorbiditiesList,
@@ -79,6 +79,15 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         'Examination': "Only positive findings",
         'Complaints': "The patients main concerns",
 
+      });
+      await FirebaseFirestore.instance
+          .collection('Patients')
+          .doc('${patientName.text}')
+      .collection("File").doc("${DateTime.now()}")
+          .set({
+        'Author': FirebaseAuth.instance.currentUser!.email,
+        "Time" : DateTime.now().toString(),
+        'Url': url,
       });
     } catch (err) {}
     setState(() {
@@ -118,7 +127,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     padding: EdgeInsets.all(15),
                   ),
                   ImagePickerClass(
-                    _pickedIMage,
+                    _pickedImage,
                   ),
                   Form(
                     autovalidateMode: AutovalidateMode.always,

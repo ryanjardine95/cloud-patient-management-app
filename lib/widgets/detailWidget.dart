@@ -11,7 +11,7 @@ class DetailWidget extends StatelessWidget {
 
     return SingleChildScrollView(
       child: Container(
-        height: deviceConfig.height / 5,
+        height: deviceConfig.height / 10,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

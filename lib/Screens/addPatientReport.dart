@@ -1,8 +1,10 @@
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/patientDetailScreen.dart';
 import 'package:cloud_patient_management/widgets/imagePicker.dart';
 import 'package:cloud_patient_management/widgets/reportForm.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
@@ -20,13 +22,14 @@ class _AddPatientReportState extends State<AddPatientReport> {
   bool _imagePicked = false;
 
   File _userImageFile = File('path');
+
   @override
   void initState() {
     super.initState();
     _getImageUrl();
   }
 
-  void _pickedIMage(File image) {
+  void _pickedImage(File image) {
     setState(() {
       _userImageFile = image;
       _imagePicked = true;
@@ -67,12 +70,20 @@ class _AddPatientReportState extends State<AddPatientReport> {
         .collection('Patients')
         .doc(
           '${widget.patientName}',
-        )
-        .update({'Url': urL});
+        ).collection('File')
+        .doc(DateTime.now().toString())
+        .set({
+      'Url': urL,
+      'Author': FirebaseAuth.instance.currentUser!.email,
+       'Time': DateTime.now(),
+    });
     setState(() {
       _isLoading = false;
     });
-    Navigator.of(context).pop();
+    Navigator.of(context).pushNamed(
+      PatientDetailScreen.routeName,
+      arguments: widget.patientName.toString(),
+    );
   }
 
   @override
@@ -131,7 +142,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
                       ),
                       Text('Or'),
                       ImagePickerClass(
-                        _pickedIMage,
+                        _pickedImage,
                       ),
                       TextButton(
                         onPressed: !_imagePicked ? () {} : _saveImage,

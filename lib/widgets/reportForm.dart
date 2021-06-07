@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/patientDetailScreen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ReportForm extends StatefulWidget {
@@ -11,14 +12,16 @@ class ReportForm extends StatefulWidget {
 }
 
 class _ReportFormState extends State<ReportForm> {
-  int numberOfPatiens = 0;
 
+  int numberOfPatiens = 0;
+  String? userEmail = FirebaseAuth.instance.currentUser!.email == null ? "" : FirebaseAuth.instance.currentUser!.email;
   bool _isLoading = false;
   TextEditingController patientComplaint = new TextEditingController();
   TextEditingController patientExamination = new TextEditingController();
   TextEditingController patientTests = new TextEditingController();
   TextEditingController patientAssement = new TextEditingController();
   TextEditingController patientPlan = new TextEditingController();
+
 
   final _formData = GlobalKey<FormState>();
 
@@ -33,12 +36,17 @@ class _ReportFormState extends State<ReportForm> {
       await FirebaseFirestore.instance
           .collection('Patients')
           .doc('${widget.patientName}')
-          .update({
+          .collection('File')
+          .doc(DateTime.now().toString())
+          .set({
+        'Author': userEmail,
+        'Time': "${DateTime.now()}",
         'Complaints': patientComplaint.text,
         'Examination': patientExamination.text,
         'Tests': patientTests.text,
         'Plan': patientPlan.text,
-        'Assessments': patientAssement.text
+        'Assessments': patientAssement.text,
+        'Url': "",
       });
     } catch (err) {}
     setState(() {
@@ -51,155 +59,158 @@ class _ReportFormState extends State<ReportForm> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? SingleChildScrollView(
+          ? SafeArea(
               child: Center(
                 child: CircularProgressIndicator.adaptive(),
               ),
             )
-          : SingleChildScrollView(
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(39),
-                  ),
-                  Center(
-                    child: Text(
-                      'Add Report From Template',
-                      style: TextStyle(fontSize: 15),
+          : SafeArea(
+            child: SingleChildScrollView(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(39),
                     ),
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Container(
-                    width: 280,
-                    child: Divider(
-                      thickness: 2,
+                    Center(
+                      child: Text(
+                        'Add Report From Template',
+                        style: TextStyle(fontSize: 15),
+                      ),
                     ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.all(20),
-                  ),
-                  Form(
-                    autovalidateMode: AutovalidateMode.always,
-                    key: _formData,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            autovalidateMode: AutovalidateMode.always,
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            controller: patientAssement,
-                            decoration: InputDecoration(
-                              labelText: 'Assesment',
-                            ),
-                            keyboardType: TextInputType.multiline,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            controller: patientComplaint,
-                            decoration: InputDecoration(
-                              labelText: 'Complaint',
-                            ),
-                            keyboardType: TextInputType.multiline,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            controller: patientPlan,
-                            decoration: InputDecoration(
-                              labelText: 'Plan',
-                            ),
-                            keyboardType: TextInputType.multiline,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textInputAction: TextInputAction.next,
-                            controller: patientTests,
-                            decoration: InputDecoration(
-                              labelText: 'Tests',
-                            ),
-                            keyboardType: TextInputType.multiline,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: TextFormField(
-                            textAlign: TextAlign.center,
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Please enter valid Name';
-                              }
-                              return null;
-                            },
-                            textAlignVertical: TextAlignVertical.center,
-                            textInputAction: TextInputAction.next,
-                            controller: patientExamination,
-                            decoration: InputDecoration(
-                              labelText: 'Examination',
-                            ),
-                            keyboardType: TextInputType.multiline,
-                          ),
-                        ),
-                      ],
+                    SizedBox(
+                      height: 10,
                     ),
-                  ),
-                  SizedBox(
-                    height: 100,
-                  ),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      primary: Colors.blue,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 80, vertical: 10),
-                      textStyle: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.normal,
-                          color: Colors.white),
+                    Container(
+                      width: 280,
+                      child: Divider(
+                        thickness: 2,
+                      ),
                     ),
-                    onPressed: () => _saveForm(),
-                    child: Text(
-                      'Done',
-                      style: TextStyle(color: Colors.white),
+                    Padding(
+                      padding: EdgeInsets.all(20),
                     ),
-                  )
-                ],
+                    Form(
+                      autovalidateMode: AutovalidateMode.always,
+                      key: _formData,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.always,
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              controller: patientAssement,
+                              decoration: InputDecoration(
+                                labelText: 'Assesment',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              controller: patientComplaint,
+                              decoration: InputDecoration(
+                                labelText: 'Complaint',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              controller: patientPlan,
+                              decoration: InputDecoration(
+                                labelText: 'Plan',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textInputAction: TextInputAction.next,
+                              controller: patientTests,
+                              decoration: InputDecoration(
+                                labelText: 'Tests',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              textAlign: TextAlign.center,
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              textInputAction: TextInputAction.next,
+                              controller: patientExamination,
+                              decoration: InputDecoration(
+                                labelText: 'Examination',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: 100,
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blue,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 80, vertical: 10),
+                        textStyle: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.normal,
+                            color: Colors.white),
+                      ),
+                      onPressed: () => _saveForm(),
+                      child: Text(
+                        'Done',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
+          ),
     );
   }
 }

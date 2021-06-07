@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/addPatientReport.dart';
 import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
 import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
-import 'package:cloud_patient_management/widgets/NonListDetailWidget.dart';
-import 'package:cloud_patient_management/widgets/PatietntfileViewer.dart';
 import 'package:cloud_patient_management/widgets/detailWidget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -25,7 +23,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   String patientAssesments = '';
   var patientComorbities = [];
   var patientTreatment = [];
-  var patientfileUrl = [];
+  List<dynamic> patientFile = [];
 
   bool _showBackToTopButton = false;
 
@@ -72,25 +70,30 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
         .collection('Patients')
         .doc(patientIds)
         .get();
+    final fileData = await FirebaseFirestore.instance
+        .collection('Patients')
+        .doc(patientIds)
+        .collection("File")
+        .get();
     print(patientData['Surname']);
     setState(() {
-      if (patientData['Assessments'] != null
-          && patientData['Tests'] != null
-          && patientData['Plan'] != null
-          && patientData['Examination'] != null
-          && patientData['Complaints'] != null){
-        patientAssesments = patientData['Assessments'];
-        patientTests = patientData['Tests'];
-        patientPlan = patientData['Plan'];
-        patientExamination = patientData['Examination'];
-        patientComplaint = patientData['Complaints'];
-      }else{
-        patientAssesments = "No Data";
-        patientTests = "No Data";
-        patientPlan = "No Data";
-        patientExamination = "No Data";
-        patientComplaint = "No Data";
-      }
+      // if (patientData['Assessments'] != null
+      //     && patientData['Tests'] != null
+      //     && patientData['Plan'] != null
+      //     && patientData['Examination'] != null
+      //     && patientData['Complaints'] != null){
+      //   patientAssesments = patientData['Assessments'];
+      //   patientTests = patientData['Tests'];
+      //   patientPlan = patientData['Plan'];
+      //   patientExamination = patientData['Examination'];
+      //   patientComplaint = patientData['Complaints'];
+      // }else{
+      //   patientAssesments = "No Data";
+      //   patientTests = "No Data";
+      //   patientPlan = "No Data";
+      //   patientExamination = "No Data";
+      //   patientComplaint = "No Data";
+      // }
       patientTreatment = List.from(patientData['Treatment']);
       patientName = patientData['Name'];
       patientSurname = patientData['Surname'];
@@ -98,7 +101,8 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       patientComorbities = List.from(
         patientData['Comorbidities'],
       );
-      patientfileUrl = List.from(patientData['Url']);
+      patientFile = List.from(fileData.docs);
+      print(patientFile.length);
     });
   }
 
@@ -107,177 +111,170 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
     var deviceConfig = MediaQuery.of(context).size;
 
     return Scaffold(
-      // appBar: AppBar(
-      //   actions: [
-      //     IconButton(
-      //       icon: Icon(Icons.add),
-      //       onPressed: () {},
-      //     )
-      //   ],
-      //   centerTitle: true,
-      //   toolbarHeight: 100,
-      //   shape: RoundedRectangleBorder(
-      //     borderRadius: BorderRadius.circular(20),
-      //   ),
-      //   elevation: 50,
-      //   titleTextStyle: TextStyle(
-      //     fontSize: 15,
-      //   ),
-      //   leading: CircleAvatar(
-      //     radius: 0.5,
-      //     child: Icon(
-      //       Icons.person,
-      //     ),
-      //   ),
-      //   title: Text('$patientName $patientSurname, Age $patientAge'),
-      // ),
       body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: SingleChildScrollView(
-              controller: _scrollController,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    height: 40.0,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Column(
-                        children: [
-                          Icon(
-                            Icons.face,
-                            size: 60.0,
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: SingleChildScrollView(
+            controller: _scrollController,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 40.0,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Column(
+                      children: [
+                        Icon(
+                          Icons.face,
+                          size: 60.0,
+                        ),
+                        Text('$patientName $patientSurname')
+                      ],
+                    ),
+                    Column(
+                      children: [
+                        Text(
+                          "Age",
+                          style: TextStyle(
+                            fontSize: 25.0,
+                            fontWeight: FontWeight.bold,
                           ),
-                          Text('$patientName $patientSurname')
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          Text(
-                            "Age",
-                            style: TextStyle(
-                              fontSize: 25.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                            "$patientAge",
-                            style: TextStyle(
-                              fontSize: 25.0,
-                              color: Colors.blue,
-                            ),
-                          )
-                        ],
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.add,
-                              size: 40.0,
-                              color: Theme.of(context).accentColor,
-                            ),
-                            onPressed: () => Navigator.of(context).push(
-                                MaterialPageRoute(
-                                    settings:
-                                        RouteSettings(name: '/PatientReport'),
-                                    builder: (context) => AddPatientReport(
-                                          patientName,
-                                          patientSurname,
-                                        ),
-                                    fullscreenDialog: false)),
-                            tooltip: "Add file",
-                          ),
-                          Text('Add File')
-                        ],
-                      ),
-                      SizedBox(
-                        width: 7,
-                      ),
-                      Column(
-                        children: [
-                          IconButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (_) {
-                                    return EditPatientScreen(
-                                      patientId: patientName,
-                                    );
-                                  },
-                                ),
-                              );
-                            },
-                            icon: Icon(
-                              Icons.edit,
-                              size: 40.0,
-                            ),
+                        ),
+                        Text(
+                          "$patientAge",
+                          style: TextStyle(
+                            fontSize: 25.0,
                             color: Colors.blue,
                           ),
-                          Text('Edit Patient'),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Divider(
-                    thickness: 2,
-                  ),
-                  DetailWidget(
-                    patientData: patientComorbities,
-                    sectionTitle: 'Comorbidities',
-                  ),
-                  DetailWidget(
-                    patientData: patientTreatment,
-                    sectionTitle: 'Treatment',
-                  ),
-                  NonListDetailWidget(
-                    patientData: patientComplaint,
-                    sectionTitle: 'Complaint',
-                  ),
-                  NonListDetailWidget(
-                    patientData: patientExamination,
-                    sectionTitle: 'Examinations',
-                  ),
-                  NonListDetailWidget(
-                    patientData: patientPlan,
-                    sectionTitle: 'Plan',
-                  ),
-                  NonListDetailWidget(
-                    patientData: patientAssesments,
-                    sectionTitle: 'Assesments',
-                  ),
-                      NonListDetailWidget(
-                    patientData: patientTests,
-                    sectionTitle: 'Tests',
-                  ),
-                  Container(
-                    height: deviceConfig.height / 2,
-                    child: ListView.builder(
-                      itemCount: patientfileUrl.length,
-                      itemBuilder: (ctx, i) => Card(
-                        child: Column(
-                          children: [
-                            Container(
-                            child: patientfileUrl[i] != ''
-                                ? PatientFileViewer(
-                                    tag: '${patientfileUrl[i]} tag',
-                                    url: patientfileUrl[i],
-                                  )
-                                : null,
-                          ),
-                          Text("Date and signature"),
-                          ]
-                        ),
-                      ),
+                        )
+                      ],
                     ),
+                    Column(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            Icons.add,
+                            size: 40.0,
+                            color: Theme.of(context).accentColor,
+                          ),
+                          onPressed: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  settings:
+                                      RouteSettings(name: '/PatientReport'),
+                                  builder: (context) => AddPatientReport(
+                                        patientName,
+                                        patientSurname,
+                                      ),
+                                  fullscreenDialog: false)),
+                          tooltip: "Add Page to File",
+                        ),
+                        Text('Add Page to File')
+                      ],
+                    ),
+                    SizedBox(
+                      width: 7,
+                    ),
+                    Column(
+                      children: [
+                        IconButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) {
+                                  return EditPatientScreen(
+                                    patientId: patientName,
+                                  );
+                                },
+                              ),
+                            );
+                          },
+                          icon: Icon(
+                            Icons.edit,
+                            size: 40.0,
+                          ),
+                          color: Colors.blue,
+                        ),
+                        Text('Edit Patient'),
+                      ],
+                    ),
+                  ],
+                ),
+                Divider(
+                  thickness: 2,
+                ),
+                DetailWidget(
+                  patientData: patientComorbities,
+                  sectionTitle: 'Comorbidities',
+                ),
+                DetailWidget(
+                  patientData: patientTreatment,
+                  sectionTitle: 'Treatment',
+                ),
+                Container(
+                  height: deviceConfig.height / 2,
+                  child: ListView.builder(
+                    itemCount: patientFile.length,
+                    itemBuilder: (context, i) {
+                      return Card(
+                      child:
+                      (){
+                        if(patientFile[i].get('Url') == ""){
+                          return Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text("${patientFile[i].get('Complaints')}"),
+                              Text("${patientFile[i].get('Examination')}"),
+                              Text("${patientFile[i].get('Tests')}"),
+                              Text("${patientFile[i].get('Assessments')}"),
+                              Text("${patientFile[i].get('Plan')}"),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("Author: ${patientFile[i].get('Author')}"),
+                                  Text("Time: ${patientFile[i].get('Time')}"),
+                                ],
+                              ),
+                              Text("Page $i"),
+                            ],
+                          );
+                        }else {
+                          return Column(
+                            children: [
+                              patientFile[i].get("Url")== null? CircularProgressIndicator():Image.network("${patientFile[i].get("Url")}"),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text("Author: ${patientFile[i].get('Author')}"),
+                                  Text("Time: ${patientFile[i].get('Time')}"),
+                                ],
+                              ),
+                              Text("Page $i"),
+                            ],
+                          );
+                        }
+                      }()
+                      // Column(
+                      //   children: [
+                      //
+                      //     Text((){
+                      //       if(patientFile[i].get('Url') == ""){
+                      //         return "${patientFile[i].get('Assessments')}, ${patientFile[i].get("Time")}";
+                      //       }else{
+                      //         return "${patientFile[i].get('Url')}";
+                      //       }
+                      //     }()),
+                      //   //Text("${patientFile[i].get('Url')}"),
+                      //   ]
+                      // ),
+                    );
+                      },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
