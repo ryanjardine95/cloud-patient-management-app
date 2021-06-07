@@ -73,6 +73,12 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         'Age': patientAge.text.toString(),
         'Comorbidities': patientcomorbiditiesList,
         'Treatment': patientTreatmentList,
+        'Assessments': 'the current working diagnoses',
+        'Plan': 'The macroscopic patient plan',
+        'Tests': 'Add tests to remind you to follow up',
+        'Examination': "Only positive findings",
+        'Complaints': "The patients main concerns",
+
       });
     } catch (err) {}
     setState(() {
@@ -85,7 +91,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isLoading
-          ? SingleChildScrollView(
+          ? SafeArea(
               child: Center(
                 child: CircularProgressIndicator.adaptive(),
               ),

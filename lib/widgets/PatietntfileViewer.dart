@@ -45,9 +45,6 @@ class PatientFileViewer extends StatelessWidget {
             ),
           ),
         ),
-        Divider(
-          thickness: 3,
-        ),
       ],
     );
   }

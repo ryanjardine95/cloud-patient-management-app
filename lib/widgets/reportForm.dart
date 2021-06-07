@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/patientDetailScreen.dart';
 import 'package:flutter/material.dart';
 
 class ReportForm extends StatefulWidget {
@@ -33,16 +34,16 @@ class _ReportFormState extends State<ReportForm> {
           .collection('Patients')
           .doc('${widget.patientName}')
           .update({
-        'Complaint': patientComplaint.text,
+        'Complaints': patientComplaint.text,
         'Examination': patientExamination.text,
         'Tests': patientTests.text,
         'Plan': patientPlan.text,
-        'Assesments': patientAssement.text
+        'Assessments': patientAssement.text
       });
     } catch (err) {}
     setState(() {
       _isLoading = false;
-      Navigator.of(context).pop();
+      Navigator.of(context).pushNamed(PatientDetailScreen.routeName, arguments: '${widget.patientName}');
     });
   }
 
