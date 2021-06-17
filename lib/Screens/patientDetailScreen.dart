@@ -47,7 +47,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
     Future.delayed(Duration.zero, () {
       setState(() {
         var args = ModalRoute.of(context);
-        patientId = args == null ? '' : args.settings.arguments.toString();
+        patientId = args == null ? 'no valid patient' : args.settings.arguments.toString();
       });
       print(patientId);
       _getPatients(patientId);
@@ -168,6 +168,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                                   builder: (context) => AddPatientReport(
                                         patientName,
                                         patientSurname,
+                                    patientId,
                                       ),
                                   fullscreenDialog: false)),
                           tooltip: "Add Page to File",

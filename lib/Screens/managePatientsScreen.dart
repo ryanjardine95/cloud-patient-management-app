@@ -10,12 +10,14 @@ class ManagePatients extends StatefulWidget {
 }
 
 class _ManagePatientsState extends State<ManagePatients> {
+  bool _isSearching = false;
   @override
   Widget build(BuildContext context) {
     int numberOfItems = 0;
     TextEditingController searchController = new TextEditingController();
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       // appBar: AppBar(
       //   backgroundColor: Colors.white,
       //   // shape: RoundedRectangleBorder(
@@ -37,15 +39,15 @@ class _ManagePatientsState extends State<ManagePatients> {
       //   centerTitle: true,
       //   title: Text('Manage Patients'),
       // ),
-      body: Container(
+      body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20.0, 40.0, 20.0, 20.0),
+          padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
           child: Column(
             //mainAxisSize: MainAxisSize.min,
             //mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               SizedBox(
-                height: 10,
+                height: 8,
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -72,12 +74,15 @@ class _ManagePatientsState extends State<ManagePatients> {
                         fontSize: 20.0,
                       ),
                     ),
-                    InkWell(
-                      onTap: () => Navigator.of(context)
-                          .pushNamed(PatientAddScreen.routeName),
-                      child: Icon(
-                        Icons.add,
-                        color: Colors.blue,
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: InkWell(
+                        onTap: () => Navigator.of(context)
+                            .pushNamed(PatientAddScreen.routeName),
+                        child: Icon(
+                          Icons.add,
+                          color: Colors.blue,
+                        ),
                       ),
                     ),
                   ],
@@ -86,20 +91,77 @@ class _ManagePatientsState extends State<ManagePatients> {
               SizedBox(
                 height: 10,
               ),
-              Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(10.0),
-                  color: Colors.grey,
-                ),
-                width: MediaQuery.of(context).size.width,
-                child: Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextFormField(
-                    initialValue: "Search ${Icon(Icons.search_rounded)}",
-                    //controller: searchController,
+              Row(
+                mainAxisSize: MainAxisSize.max,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.grey,
+                    ),
+                    width: MediaQuery.of(context).size.width,
+                    child: Padding(
+                      padding: const EdgeInsets.all(6.0),
+                      child: TextFormField(
+                        // onTap: (){
+                        //   setState(() {
+                        //     _isSearching = true;
+                        //   });
+                        // },
+                        controller: searchController,
+                        validator: (value){
+                          if(value == null || value.length != 13){
+                            return "Please enter 13 digit id number";
+                          }else{
+                            return null;
+                          }
+                        },
+                        //initialValue: "Search ${Icons.search_rounded}",
+                        decoration: InputDecoration(
+                          hintText: "Search patient ID number here",
+                        ),
+                        //controller: searchController,
 
-                  ),
+                      ),
+                    ),
                 ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10.0),
+                        color: Colors.grey,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(6.0),
+                        child: IconButton(
+                            onPressed: (){
+                              setState(() {
+                                _isSearching = true;
+                              });
+                              if(FirebaseFirestore.instance
+                                  .collection('Patients')
+                                  .doc(searchController.value.toString()) == null){
+
+                              }else{
+                                Navigator.of(context).pushNamed(
+                                    PatientDetailScreen.routeName,
+                                    arguments: searchController.text
+                                );
+                              }
+                              setState(() {
+                                _isSearching = false;
+                              });
+                            },
+                            icon: Icon(Icons.search_rounded),
+                        ),
+                      ),
+                    ),
+                  ),
+                ]
               ),
               StreamBuilder(
                   stream: FirebaseFirestore.instance
@@ -113,7 +175,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                     numberOfItems = patientData.length;
                     print(numberOfItems);
 
-                    return Padding(
+                    return _isSearching ? CircularProgressIndicator():Padding(
                       padding: EdgeInsets.all(0.0),
                       //width: deviceConfig.width - 150,
                       //height: deviceConfig.height - 40,

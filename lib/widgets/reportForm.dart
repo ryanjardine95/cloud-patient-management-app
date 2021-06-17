@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 
 class ReportForm extends StatefulWidget {
   static const routeName = '/PatientAddScreen';
-  final patientName;
-  ReportForm(this.patientName);
+  final patientId;
+  ReportForm(this.patientId);
   @override
   _ReportFormState createState() => _ReportFormState();
 }
@@ -28,6 +28,7 @@ class _ReportFormState extends State<ReportForm> {
   bool isValid = false;
 
   Future<void> _saveForm() async {
+    print(widget.patientId.toString());
     setState(() {
       numberOfPatiens = numberOfPatiens + 1;
       _isLoading = true;
@@ -35,7 +36,7 @@ class _ReportFormState extends State<ReportForm> {
     try {
       await FirebaseFirestore.instance
           .collection('Patients')
-          .doc('${widget.patientName}')
+          .doc('${widget.patientId}')
           .collection('File')
           .doc(DateTime.now().toString())
           .set({
@@ -51,7 +52,7 @@ class _ReportFormState extends State<ReportForm> {
     } catch (err) {}
     setState(() {
       _isLoading = false;
-      Navigator.of(context).pushNamed(PatientDetailScreen.routeName, arguments: '${widget.patientName}');
+      Navigator.of(context).pushNamed(PatientDetailScreen.routeName, arguments: '${widget.patientId}');
     });
   }
 
@@ -100,24 +101,6 @@ class _ReportFormState extends State<ReportForm> {
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             child: TextFormField(
-                              autovalidateMode: AutovalidateMode.always,
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please enter valid Name';
-                                }
-                                return null;
-                              },
-                              textAlignVertical: TextAlignVertical.center,
-                              controller: patientAssement,
-                              decoration: InputDecoration(
-                                labelText: 'Assesment',
-                              ),
-                              keyboardType: TextInputType.multiline,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: TextFormField(
                               validator: (value) {
                                 if (value == null) {
                                   return 'Please enter valid Name';
@@ -126,42 +109,9 @@ class _ReportFormState extends State<ReportForm> {
                               },
                               textAlignVertical: TextAlignVertical.center,
                               controller: patientComplaint,
+                              maxLines: 5,
                               decoration: InputDecoration(
                                 labelText: 'Complaint',
-                              ),
-                              keyboardType: TextInputType.multiline,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: TextFormField(
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please enter valid Name';
-                                }
-                                return null;
-                              },
-                              textAlignVertical: TextAlignVertical.center,
-                              controller: patientPlan,
-                              decoration: InputDecoration(
-                                labelText: 'Plan',
-                              ),
-                              keyboardType: TextInputType.multiline,
-                            ),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            child: TextFormField(
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Please enter valid Name';
-                                }
-                                return null;
-                              },
-                              textInputAction: TextInputAction.next,
-                              controller: patientTests,
-                              decoration: InputDecoration(
-                                labelText: 'Tests',
                               ),
                               keyboardType: TextInputType.multiline,
                             ),
@@ -179,8 +129,64 @@ class _ReportFormState extends State<ReportForm> {
                               textAlignVertical: TextAlignVertical.center,
                               textInputAction: TextInputAction.next,
                               controller: patientExamination,
+                              maxLines: 5,
                               decoration: InputDecoration(
                                 labelText: 'Examination',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textInputAction: TextInputAction.next,
+                              controller: patientTests,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                labelText: 'Tests',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              autovalidateMode: AutovalidateMode.always,
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              controller: patientAssement,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                labelText: 'Assesment',
+                              ),
+                              keyboardType: TextInputType.multiline,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Please enter valid Name';
+                                }
+                                return null;
+                              },
+                              textAlignVertical: TextAlignVertical.center,
+                              controller: patientPlan,
+                              maxLines: 5,
+                              decoration: InputDecoration(
+                                labelText: 'Plan',
                               ),
                               keyboardType: TextInputType.multiline,
                             ),
@@ -189,7 +195,7 @@ class _ReportFormState extends State<ReportForm> {
                       ),
                     ),
                     SizedBox(
-                      height: 100,
+                      height: 50,
                     ),
                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
@@ -206,7 +212,10 @@ class _ReportFormState extends State<ReportForm> {
                         'Done',
                         style: TextStyle(color: Colors.white),
                       ),
-                    )
+                    ),
+                    SizedBox(
+                      height: 50,
+                    ),
                   ],
                 ),
               ),

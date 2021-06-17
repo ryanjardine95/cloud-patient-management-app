@@ -9,9 +9,10 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 
 class AddPatientReport extends StatefulWidget {
+  final patientId;
   final patientName;
   final patientSurname;
-  AddPatientReport(this.patientName, this.patientSurname);
+  AddPatientReport(this.patientName, this.patientSurname, this.patientId);
   @override
   _AddPatientReportState createState() => _AddPatientReportState();
 }
@@ -70,7 +71,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
     await FirebaseFirestore.instance
         .collection('Patients')
         .doc(
-          '${widget.patientName}',
+          '${widget.patientId}',
         ).collection('File')
         .doc(DateTime.now().toString())
         .set({
@@ -83,7 +84,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
     });
     Navigator.of(context).pushNamed(
       PatientDetailScreen.routeName,
-      arguments: widget.patientName.toString(),
+      arguments: widget.patientId.toString(),
     );
   }
 
@@ -153,7 +154,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
                   ),
                 )
               : ReportForm(
-                  widget.patientName,
+                  widget.patientId,
                 ),
     );
   }
