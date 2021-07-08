@@ -5,10 +5,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Screens/patientDetailScreen.dart';
 import 'Screens/addPatientScreen.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
+  firebaseAppCheck.activate();
+  SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
+
   runApp(MyApp());
 }
 
@@ -19,8 +25,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cloud Patient Management',
-      theme:
-          ThemeData(primarySwatch: Colors.grey, accentColor: Colors.blue),
+      theme: ThemeData(
+          fontFamily: GoogleFonts.titilliumWeb().fontFamily,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          primarySwatch: Colors.grey,
+          accentColor: Colors.blue),
       routes: {
         PatientDetailScreen.routeName: (ctx) => PatientDetailScreen(),
         PatientAddScreen.routeName: (ctx) => PatientAddScreen(),
@@ -143,7 +152,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-          ), // This trailing comma makes auto-formatting nicer for build methods.
+          ),
         ),
       ),
     ));

@@ -1,10 +1,10 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_patient_management/Screens/imagePicker.dart';
 import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_patient_management/widgets/imagePicker.dart';
 
 class PatientAddScreen extends StatefulWidget {
   static const routeName = '/PatientAddScreen';
@@ -63,7 +63,6 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       await ref.putFile(_userImageFile);
       final String data = await ref.getDownloadURL();
       final String url = data;
-      //final List<String> urls = url.split(',');
 
       await FirebaseFirestore.instance
           .collection('Patients')
@@ -80,11 +79,12 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       await FirebaseFirestore.instance
           .collection('Patients')
           .doc('${patientId.text.toString()}')
-      .collection("File").doc("${DateTime.now()}")
+          .collection("File")
+          .doc("${DateTime.now()}")
           .set({
         'Author': FirebaseAuth.instance.currentUser!.email,
-        "Time" : DateTime.now().toString(),
-        'Url': url,
+        "Time": DateTime.now().toString(),
+        'Url': url as List,
       });
     } catch (err) {}
     setState(() {
@@ -106,11 +106,14 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
               ),
             )
           : SafeArea(
-            child: SingleChildScrollView(
+              child: SingleChildScrollView(
                 child: Column(
                   children: [
                     Center(
-                      child: Text('Add Patient', style: TextStyle(fontSize: 20),),
+                      child: Text(
+                        'Add Patient',
+                        style: TextStyle(fontSize: 20),
+                      ),
                     ),
                     SizedBox(
                       height: 10,
@@ -124,9 +127,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                     Padding(
                       padding: EdgeInsets.all(15),
                     ),
-                    ImagePickerClass(
-                      _pickedImage,
-                    ),
+                    ImagePickerClass(_pickedImage),
                     Form(
                       autovalidateMode: AutovalidateMode.always,
                       key: _formData,
@@ -179,7 +180,8 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                               textAlignVertical: TextAlignVertical.center,
                               textInputAction: TextInputAction.next,
                               controller: patientId,
-                              decoration: InputDecoration(labelText: 'ID Number'),
+                              decoration:
+                                  InputDecoration(labelText: 'ID Number'),
                               keyboardType: TextInputType.number,
                             ),
                           ),
@@ -262,7 +264,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
                   ],
                 ),
               ),
-          ),
+            ),
     );
   }
 }
