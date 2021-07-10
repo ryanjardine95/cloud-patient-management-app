@@ -7,6 +7,7 @@ import 'package:cloud_patient_management/widgets/reportForm.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wechat_assets_picker/wechat_assets_picker.dart';
 
 class AddPatientReport extends StatefulWidget {
@@ -33,9 +34,19 @@ class _AddPatientReportState extends State<AddPatientReport> {
     });
   }
 
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
+  }
+
   @override
   void initState() {
     super.initState();
+    getDB();
+
     _generateRandomNumber();
     print(_counter);
   }
@@ -67,7 +78,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
       final ref = FirebaseStorage.instance
           .ref()
           .child('patients')
-          .child('${widget.patientName}/$_counter');
+          .child('${widget.patientId}/$_counter');
       // ignore: unused_local_variable
       AssetEntity eleId =
           new AssetEntity(id: '', typeInt: 5, width: 5, height: 5);
@@ -86,6 +97,8 @@ class _AddPatientReportState extends State<AddPatientReport> {
         await e.getDownloadURL().then((value) => listUrls.add(value));
       }));
       await FirebaseFirestore.instance
+          .collection(result)
+          .doc(result)
           .collection('Patients')
           .doc(
             '${widget.patientId}',
@@ -95,7 +108,7 @@ class _AddPatientReportState extends State<AddPatientReport> {
           .set({
         'Url': listUrls,
         'Author': FirebaseAuth.instance.currentUser!.email,
-        'Time': DateTime.now(),
+        'Time': '${DateTime.now()}',
       });
       setState(() {
         _isLoading = false;

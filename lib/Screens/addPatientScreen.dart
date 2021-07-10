@@ -1,10 +1,12 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/imagePicker.dart';
-import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
+import 'package:encrypt/encrypt.dart' as Encrypt;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientAddScreen extends StatefulWidget {
   static const routeName = '/PatientAddScreen';
@@ -17,12 +19,22 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   @override
   void initState() {
     super.initState();
+    _generateRandomNumber();
+    getDB();
     Future.delayed(Duration.zero, () {
       setState(() {
         var args = ModalRoute.of(context);
         numberOfPatiens = args == null ? 0 : args.settings.arguments as int;
       });
     });
+  }
+
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
   }
 
   bool _isLoading = false;
@@ -44,9 +56,23 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
     });
   }
 
+  int _counter = 0;
+  void _generateRandomNumber() {
+    var random = new Random();
+    setState(() {
+      _counter = random.nextInt(100);
+    });
+  }
+
   bool isValid = false;
 
   Future<void> _saveForm() async {
+    final testEncrypt = patientName.text;
+    final Encrypt.Key key = new Encrypt.Key.fromLength(32);
+    final Encrypt.Encrypter encrypter = Encrypt.Encrypter(Encrypt.AES(key));
+    final iv = Encrypt.IV.fromLength(32);
+    final Encrypt.Encrypted encrypted = encrypter.encrypt(testEncrypt, iv: iv);
+
     setState(() {
       patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
       patientTreatmentList = patientTreatment.text.split(',').toList();
@@ -58,16 +84,20 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
       final ref = FirebaseStorage.instance
           .ref()
           .child('patients')
-          .child(patientName.text + 'jpg');
+          .child('${patientId.text.toString()}/$_counter');
 
       await ref.putFile(_userImageFile);
       final String data = await ref.getDownloadURL();
-      final String url = data;
+      final List<String> url = [];
+      url.add(data);
 
       await FirebaseFirestore.instance
+          .collection(result)
+          .doc(result)
           .collection('Patients')
           .doc('${patientId.text.toString()}')
           .set({
+        'TestEncrypt': encrypted,
         'Name': patientName.text,
         'Surname': patientSurname.text,
         'PatientId': 'Patient$numberOfPatiens',
@@ -77,23 +107,26 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
         "ID": patientId.text.toString(),
       });
       await FirebaseFirestore.instance
+          .collection(result)
+          .doc(result)
           .collection('Patients')
-          .doc('${patientId.text.toString()}')
-          .collection("File")
-          .doc("${DateTime.now()}")
+          .doc(
+            '${patientId.text.toString()}',
+          )
+          .collection('File')
+          .doc(DateTime.now().toString())
           .set({
         'Author': FirebaseAuth.instance.currentUser!.email,
         "Time": DateTime.now().toString(),
-        'Url': url as List,
+        'Url': url,
       });
-    } catch (err) {}
-    setState(() {
-      _isLoading = false;
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => ManagePatients()),
-      );
-    });
+      setState(() {
+        _isLoading = false;
+        Navigator.pop(context);
+      });
+    } catch (err) {
+      print(err);
+    }
   }
 
   @override

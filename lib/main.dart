@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -7,6 +8,15 @@ import 'Screens/patientDetailScreen.dart';
 import 'Screens/addPatientScreen.dart';
 import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+Future<void> setDb(String value) async {
+  final data = await _prefs;
+
+  await data.setString('HospitalId', value);
+}
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,12 +24,24 @@ Future<void> main() async {
   FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
   firebaseAppCheck.activate();
   SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
-
   runApp(MyApp());
 }
 
+String result = '';
+
+Future<void> getHId(
+  AsyncSnapshot<User?> snapshot,
+) async {
+  final db =
+      FirebaseFirestore.instance.collection('Users').doc(snapshot.data!.uid);
+  final data = await db.get();
+  print(snapshot.data!.uid);
+
+  result = data.data()!['HospitalId'].toString();
+  setDb(result);
+}
+
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -36,8 +58,10 @@ class MyApp extends StatelessWidget {
       },
       home: StreamBuilder(
         stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, snapshot) {
+        builder: (ctx, AsyncSnapshot<User?> snapshot) {
           if (snapshot.hasData && snapshot.data != null) {
+            getHId(snapshot);
+
             return ManagePatients();
           } else {
             return MyHomePage(title: 'Cloud Patient Management');

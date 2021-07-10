@@ -4,6 +4,7 @@ import 'package:cloud_patient_management/Screens/dashboard.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'patientDetailScreen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ManagePatients extends StatefulWidget {
   @override
@@ -11,6 +12,20 @@ class ManagePatients extends StatefulWidget {
 }
 
 class _ManagePatientsState extends State<ManagePatients> {
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
+  }
+
+  @override
+  void initState() {
+    getDB();
+    super.initState();
+  }
+
   bool _isSearching = false;
   @override
   Widget build(BuildContext context) {
@@ -145,9 +160,9 @@ class _ManagePatientsState extends State<ManagePatients> {
                                   _isSearching = true;
                                 });
                                 if (FirebaseFirestore.instance
-                                        .collection('Patients')
-                                        // ignore: unnecessary_null_comparison
+                                        .collection(result).doc(result).collection('Patients')
                                         .doc(searchController.value
+                                            // ignore: unnecessary_null_comparison
                                             .toString()) ==
                                     null) {
                                 } else {
@@ -167,7 +182,7 @@ class _ManagePatientsState extends State<ManagePatients> {
                     ]),
                 StreamBuilder(
                     stream: FirebaseFirestore.instance
-                        .collection('Patients')
+                        .collection(result).doc(result).collection('Patients')
                         .snapshots(),
                     builder: (context, AsyncSnapshot snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {

@@ -2,11 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/addPatientReport.dart';
 import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
-import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
 import 'package:cloud_patient_management/widgets/detailWidget.dart';
 import 'package:cloud_patient_management/widgets/fullScreenFileViewer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientDetailScreen extends StatefulWidget {
   static const routeName = '/patientDetailScreen';
@@ -31,10 +31,19 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
 
   ScrollController _scrollController = new ScrollController();
   String patientId = '';
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
+  }
 
   @override
   void initState() {
     super.initState();
+    getDB();
+
     _scrollController = ScrollController()
       ..addListener(() {
         setState(() {
@@ -70,10 +79,14 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   var i = 0;
   Future<void> _getPatients(String patientIds) async {
     final patientData = await FirebaseFirestore.instance
+        .collection(result)
+        .doc(result)
         .collection('Patients')
         .doc(patientIds)
         .get();
     final fileData = await FirebaseFirestore.instance
+        .collection(result)
+        .doc(result)
         .collection('Patients')
         .doc(patientIds)
         .collection("File")
@@ -132,7 +145,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                           Icons.face,
                           size: 60.0,
                         ),
-                        Text('$patientName $patientSurname')
+                        Text('$patientName $patientSurname', overflow: TextOverflow.ellipsis,softWrap: true,)
                       ],
                     ),
                     Column(
@@ -170,7 +183,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                                     patientId: patientId,
                                   ),
                                 ))),
-                        Text('Add Page to File')
+                        Text('Add to File')
                       ],
                     ),
                     SizedBox(
@@ -414,10 +427,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
           : IconButton(
               icon: Icon(Icons.keyboard_return),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ManagePatients()),
-                );
+                Navigator.pop(context);
               }),
     );
   }
