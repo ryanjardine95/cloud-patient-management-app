@@ -48,6 +48,7 @@ android {
         applicationId "com.example.cloud_patient_management"
         minSdkVersion 29
         targetSdkVersion 30
+        buildToolsVersion = "26.0.0"
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true

@@ -6,6 +6,8 @@ import 'package:cloud_patient_management/widgets/detailWidget.dart';
 import 'package:cloud_patient_management/widgets/fullScreenFileViewer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientDetailScreen extends StatefulWidget {
@@ -23,6 +25,8 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   String patientPlan = '';
   String patientTests = '';
   String patientAssesments = '';
+  String? patientEncryptedData;
+  String unencryptedData = '';
   var patientComorbities = [];
   var patientTreatment = [];
   List<dynamic> patientFile = [];
@@ -33,7 +37,6 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   String patientId = '';
   Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
   String result = '';
-
   Future<void> getDB() async {
     final data = await _prefs;
     result = data.getString('HospitalId')!;
@@ -109,6 +112,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       //   patientExamination = "No Data";
       //   patientComplaint = "No Data";
       // }
+      patientEncryptedData = patientData['TestEncrypt'];
       patientTreatment = List.from(patientData['Treatment']);
       patientName = patientData['Name'];
       patientSurname = patientData['Surname'];
@@ -118,6 +122,14 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       );
       patientFile = List.from(fileData.docs);
     });
+    await unencryptData();
+  }
+
+  Future<void> unencryptData() async {
+    final key = encrypt.Key.fromLength(32);
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    unencryptedData = encrypter.decrypt64(patientEncryptedData!, iv: iv);
   }
 
   @override
@@ -145,7 +157,11 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                           Icons.face,
                           size: 60.0,
                         ),
-                        Text('$patientName $patientSurname', overflow: TextOverflow.ellipsis,softWrap: true,)
+                        Text(
+                          '$patientName + $patientSurname',
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                        )
                       ],
                     ),
                     Column(

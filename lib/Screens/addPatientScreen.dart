@@ -2,7 +2,7 @@ import 'dart:io';
 import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/imagePicker.dart';
-import 'package:encrypt/encrypt.dart' as Encrypt;
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
@@ -68,10 +68,11 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
 
   Future<void> _saveForm() async {
     final testEncrypt = patientName.text;
-    final Encrypt.Key key = new Encrypt.Key.fromLength(32);
-    final Encrypt.Encrypter encrypter = Encrypt.Encrypter(Encrypt.AES(key));
-    final iv = Encrypt.IV.fromLength(32);
-    final Encrypt.Encrypted encrypted = encrypter.encrypt(testEncrypt, iv: iv);
+    final key = encrypt.Key.fromLength(32);
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+
+    final encrypted = encrypter.encrypt(testEncrypt, iv: iv);
 
     setState(() {
       patientcomorbiditiesList = patientcomorbidities.text.split(',').toList();
@@ -97,7 +98,7 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
           .collection('Patients')
           .doc('${patientId.text.toString()}')
           .set({
-        'TestEncrypt': encrypted,
+        'TestEncrypt': encrypted.base64,
         'Name': patientName.text,
         'Surname': patientSurname.text,
         'PatientId': 'Patient$numberOfPatiens',
@@ -130,7 +131,9 @@ class _PatientAddScreenState extends State<PatientAddScreen> {
   }
 
   @override
+  
   Widget build(BuildContext context) {
+    
     return Scaffold(
       body: _isLoading
           ? SafeArea(

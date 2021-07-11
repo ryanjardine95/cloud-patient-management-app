@@ -10,14 +10,6 @@ import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
-
-Future<void> setDb(String value) async {
-  final data = await _prefs;
-
-  await data.setString('HospitalId', value);
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -27,23 +19,32 @@ Future<void> main() async {
   runApp(MyApp());
 }
 
-String result = '';
-
-Future<void> getHId(
-  AsyncSnapshot<User?> snapshot,
-) async {
-  final db =
-      FirebaseFirestore.instance.collection('Users').doc(snapshot.data!.uid);
-  final data = await db.get();
-  print(snapshot.data!.uid);
-
-  result = data.data()!['HospitalId'].toString();
-  setDb(result);
-}
-
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+    Future<void> setDb(String value) async {
+      final data = await _prefs;
+
+      await data.setString('HospitalId', value);
+    }
+
+    late String result = '';
+
+    Future<void> getHId(
+      AsyncSnapshot<User?> snapshot,
+    ) async {
+      final db = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(snapshot.data!.uid);
+      final data = await db.get();
+      print(snapshot.data!.uid);
+
+      result = data.data()!['HospitalId'].toString();
+      setDb(result);
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cloud Patient Management',
@@ -57,17 +58,17 @@ class MyApp extends StatelessWidget {
         PatientAddScreen.routeName: (ctx) => PatientAddScreen(),
       },
       home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, AsyncSnapshot<User?> snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            getHId(snapshot);
-
-            return ManagePatients();
-          } else {
-            return MyHomePage(title: 'Cloud Patient Management');
-          }
-        },
-      ),
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, AsyncSnapshot<User?> snapshot) {
+            Duration();
+            if (snapshot.connectionState == ConnectionState.waiting) {}
+            if (snapshot.hasData && snapshot.data != null) {
+              getHId(snapshot);
+              return ManagePatients();
+            } else {
+              return MyHomePage(title: 'Cloud Patient Management');
+            }
+          }),
     );
   }
 }
