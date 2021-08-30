@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -5,36 +6,69 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'Screens/patientDetailScreen.dart';
 import 'Screens/addPatientScreen.dart';
+import 'package:firebase_app_check/firebase_app_check.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  FirebaseAppCheck firebaseAppCheck = FirebaseAppCheck.instance;
+  firebaseAppCheck.activate();
+  SystemChrome.setEnabledSystemUIOverlays(SystemUiOverlay.values);
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+
+    Future<void> setDb(String value) async {
+      final data = await _prefs;
+
+      await data.setString('HospitalId', value);
+    }
+
+    late String result = '';
+
+    Future<void> getHId(
+      AsyncSnapshot<User?> snapshot,
+    ) async {
+      final db = FirebaseFirestore.instance
+          .collection('Users')
+          .doc(snapshot.data!.uid);
+      final data = await db.get();
+      print(snapshot.data!.uid);
+
+      result = data.data()!['HospitalId'].toString();
+      setDb(result);
+    }
+
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Cloud Patient Management',
-      theme:
-          ThemeData(primarySwatch: Colors.grey, accentColor: Colors.blue),
+      theme: ThemeData(
+          fontFamily: GoogleFonts.titilliumWeb().fontFamily,
+          visualDensity: VisualDensity.adaptivePlatformDensity,
+          primarySwatch: Colors.grey,
+          accentColor: Colors.blue),
       routes: {
         PatientDetailScreen.routeName: (ctx) => PatientDetailScreen(),
         PatientAddScreen.routeName: (ctx) => PatientAddScreen(),
       },
       home: StreamBuilder(
-        stream: FirebaseAuth.instance.authStateChanges(),
-        builder: (ctx, snapshot) {
-          if (snapshot.hasData && snapshot.data != null) {
-            return ManagePatients();
-          } else {
-            return MyHomePage(title: 'Cloud Patient Management');
-          }
-        },
-      ),
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (ctx, AsyncSnapshot<User?> snapshot) {
+            Duration();
+            if (snapshot.connectionState == ConnectionState.waiting) {}
+            if (snapshot.hasData && snapshot.data != null) {
+              getHId(snapshot);
+              return ManagePatients();
+            } else {
+              return MyHomePage(title: 'Cloud Patient Management');
+            }
+          }),
     );
   }
 }
@@ -143,7 +177,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
             ],
-          ), // This trailing comma makes auto-formatting nicer for build methods.
+          ),
         ),
       ),
     ));

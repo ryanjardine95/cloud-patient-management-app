@@ -156,14 +156,14 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                               }
                               return null;
                             },
-                            textInputAction: TextInputAction.next,
+                            textInputAction: TextInputAction.newline,
                             //initialValue: patientcomorbiditiesList.toString(),
                             controller: patientcomorbidities,
                             decoration: InputDecoration(
                               labelText: 'Comorbidities',
                               hintText: 'Please seperate using commas',
                             ),
-                            keyboardType: TextInputType.text,
+                            keyboardType: TextInputType.multiline,
                             maxLines: 5,
                           ),
                         ),
@@ -176,14 +176,14 @@ class _EditPatientScreenState extends State<EditPatientScreen> {
                               }
                               return null;
                             },
-                            textInputAction: TextInputAction.next,
+                            textInputAction: TextInputAction.newline,
                             controller: patientTreatment,
                             //initialValue: patientTreatmentList.toString(),
                             decoration: InputDecoration(
                               labelText: 'Treatments',
                               hintText: 'Please seperate using commas',
                             ),
-                            keyboardType: TextInputType.text,
+                            keyboardType: TextInputType.multiline,
                             maxLines: 5,
                           ),
                         ),

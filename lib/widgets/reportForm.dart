@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/patientDetailScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReportForm extends StatefulWidget {
   static const routeName = '/PatientAddScreen';
@@ -12,9 +13,10 @@ class ReportForm extends StatefulWidget {
 }
 
 class _ReportFormState extends State<ReportForm> {
-
   int numberOfPatiens = 0;
-  String? userEmail = FirebaseAuth.instance.currentUser!.email == null ? "" : FirebaseAuth.instance.currentUser!.email;
+  String? userEmail = FirebaseAuth.instance.currentUser!.email == null
+      ? ""
+      : FirebaseAuth.instance.currentUser!.email;
   bool _isLoading = false;
   TextEditingController patientComplaint = new TextEditingController();
   TextEditingController patientExamination = new TextEditingController();
@@ -22,10 +24,22 @@ class _ReportFormState extends State<ReportForm> {
   TextEditingController patientAssement = new TextEditingController();
   TextEditingController patientPlan = new TextEditingController();
 
-
   final _formData = GlobalKey<FormState>();
 
   bool isValid = false;
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getDB();
+  }
 
   Future<void> _saveForm() async {
     print(widget.patientId.toString());
@@ -35,6 +49,8 @@ class _ReportFormState extends State<ReportForm> {
     });
     try {
       await FirebaseFirestore.instance
+          .collection(result)
+          .doc(result)
           .collection('Patients')
           .doc('${widget.patientId}')
           .collection('File')
@@ -52,7 +68,8 @@ class _ReportFormState extends State<ReportForm> {
     } catch (err) {}
     setState(() {
       _isLoading = false;
-      Navigator.of(context).pushNamed(PatientDetailScreen.routeName, arguments: '${widget.patientId}');
+      Navigator.of(context).pushNamed(PatientDetailScreen.routeName,
+          arguments: '${widget.patientId}');
     });
   }
 
@@ -66,7 +83,7 @@ class _ReportFormState extends State<ReportForm> {
               ),
             )
           : SafeArea(
-            child: SingleChildScrollView(
+              child: SingleChildScrollView(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -219,7 +236,7 @@ class _ReportFormState extends State<ReportForm> {
                   ],
                 ),
               ),
-          ),
+            ),
     );
   }
 }

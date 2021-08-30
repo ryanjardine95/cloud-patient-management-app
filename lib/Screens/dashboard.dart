@@ -12,14 +12,42 @@ class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      floatingActionButton: FloatingActionButton.extended(
+        icon: Icon(Icons.close),
+        label: Text('Close'),
+        onPressed: () => Navigator.pop(
+          context,
+        ),
+      ),
       body: SafeArea(
-        child: Center(
+        child: Container(
+          height: 500,
+          width: double.infinity,
+          margin: EdgeInsets.all(15),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                  "This screen will serve as a statistical overview of each clinic"),
-              Text("Number of Patients currently registered:"),
+              Container(
+                padding:
+                    EdgeInsets.only(top: 25, bottom: 15, left: 0, right: 0),
+                child: Text(
+                  "Statistical overview of each clinic",
+                  softWrap: true,
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                ),
+              ),
+              Container(
+                width: 280,
+                child: Divider(
+                  thickness: 2,
+                ),
+              ),
+              Container(
+                  padding:
+                      EdgeInsets.only(top: 25, bottom: 10, left: 0, right: 0),
+                  child: Text(
+                    "Number of Patients currently registered:",
+                    style: TextStyle(fontSize: 15),
+                  )),
               StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Patients')
@@ -30,8 +58,16 @@ class _DashboardState extends State<Dashboard> {
                     }
                     var patientData = snapshot.data.docs;
                     numberOfItems = patientData.length;
-                    print(numberOfItems);
-                    return Text("$numberOfItems");
+                    return Container(
+                        width: 300,
+                        height: 120,
+                        padding: EdgeInsets.only(
+                            top: 10, bottom: 15, left: 130, right: 150),
+                        child: Text(
+                          "$numberOfItems",
+                          style: TextStyle(
+                              fontSize: 25, fontStyle: FontStyle.italic),
+                        ));
                   }),
             ],
           ),

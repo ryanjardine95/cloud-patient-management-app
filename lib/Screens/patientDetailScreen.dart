@@ -2,10 +2,13 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_patient_management/Screens/addPatientReport.dart';
 import 'package:cloud_patient_management/Screens/editPatientScreen.dart';
-import 'package:cloud_patient_management/Screens/managePatientsScreen.dart';
 import 'package:cloud_patient_management/widgets/detailWidget.dart';
+import 'package:cloud_patient_management/widgets/fullScreenFileViewer.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:encrypt/encrypt.dart' as encrypt;
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PatientDetailScreen extends StatefulWidget {
   static const routeName = '/patientDetailScreen';
@@ -22,6 +25,8 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   String patientPlan = '';
   String patientTests = '';
   String patientAssesments = '';
+  String? patientEncryptedData;
+  String unencryptedData = '';
   var patientComorbities = [];
   var patientTreatment = [];
   List<dynamic> patientFile = [];
@@ -30,10 +35,18 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
 
   ScrollController _scrollController = new ScrollController();
   String patientId = '';
+  Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
+  String result = '';
+  Future<void> getDB() async {
+    final data = await _prefs;
+    result = data.getString('HospitalId')!;
+  }
 
   @override
   void initState() {
     super.initState();
+    getDB();
+
     _scrollController = ScrollController()
       ..addListener(() {
         setState(() {
@@ -47,9 +60,10 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
     Future.delayed(Duration.zero, () {
       setState(() {
         var args = ModalRoute.of(context);
-        patientId = args == null ? 'no valid patient' : args.settings.arguments.toString();
+        patientId = args == null
+            ? 'no valid patient'
+            : args.settings.arguments.toString();
       });
-      print(patientId);
       _getPatients(patientId);
     });
   }
@@ -68,15 +82,18 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
   var i = 0;
   Future<void> _getPatients(String patientIds) async {
     final patientData = await FirebaseFirestore.instance
+        .collection(result)
+        .doc(result)
         .collection('Patients')
         .doc(patientIds)
         .get();
     final fileData = await FirebaseFirestore.instance
+        .collection(result)
+        .doc(result)
         .collection('Patients')
         .doc(patientIds)
         .collection("File")
         .get();
-    print(patientData['Surname']);
     setState(() {
       // if (patientData['Assessments'] != null
       //     && patientData['Tests'] != null
@@ -95,6 +112,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
       //   patientExamination = "No Data";
       //   patientComplaint = "No Data";
       // }
+      patientEncryptedData = patientData['TestEncrypt'];
       patientTreatment = List.from(patientData['Treatment']);
       patientName = patientData['Name'];
       patientSurname = patientData['Surname'];
@@ -103,8 +121,15 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
         patientData['Comorbidities'],
       );
       patientFile = List.from(fileData.docs);
-      print(patientFile[0]["Url"]);
     });
+    await unencryptData();
+  }
+
+  Future<void> unencryptData() async {
+    final key = encrypt.Key.fromLength(32);
+    final iv = encrypt.IV.fromLength(16);
+    final encrypter = encrypt.Encrypter(encrypt.AES(key));
+    unencryptedData = encrypter.decrypt64(patientEncryptedData!, iv: iv);
   }
 
   @override
@@ -132,7 +157,11 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                           Icons.face,
                           size: 60.0,
                         ),
-                        Text('$patientName $patientSurname')
+                        Text(
+                          '$patientName + $patientSurname',
+                          overflow: TextOverflow.ellipsis,
+                          softWrap: true,
+                        )
                       ],
                     ),
                     Column(
@@ -156,24 +185,21 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                     Column(
                       children: [
                         IconButton(
-                          icon: Icon(
-                            Icons.add,
-                            size: 40.0,
-                            color: Theme.of(context).accentColor,
-                          ),
-                          onPressed: () => Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  settings:
-                                      RouteSettings(name: '/PatientReport'),
-                                  builder: (context) => AddPatientReport(
-                                        patientName,
-                                        patientSurname,
-                                    patientId,
-                                      ),
-                                  fullscreenDialog: false)),
-                          tooltip: "Add Page to File",
-                        ),
-                        Text('Add Page to File')
+                            icon: Icon(
+                              Icons.add,
+                              size: 30.0,
+                              color: Theme.of(context).accentColor,
+                            ),
+                            onPressed: () => Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (_) => AddPatientReport(
+                                    patientName: patientName,
+                                    patientSurname: patientSurname,
+                                    patientId: patientId,
+                                  ),
+                                ))),
+                        Text('Add to File')
                       ],
                     ),
                     SizedBox(
@@ -183,7 +209,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                       children: [
                         IconButton(
                           onPressed: () {
-                            Navigator.push(
+                            Navigator.pushReplacement(
                               context,
                               MaterialPageRoute(
                                 builder: (_) {
@@ -223,7 +249,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                     itemCount: patientFile.length,
                     itemBuilder: (context, i) {
                       return Card(child: () {
-                        if (patientFile[i].get('Url') == "") {
+                        if (patientFile[i]['Url'] == "") {
                           return Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -331,14 +357,37 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                patientFile[i].get("Url") == null
+                                patientFile[i]['Url'] == null
                                     ? CircularProgressIndicator()
-                                    : Image(
-                                        image: CachedNetworkImageProvider(
-                                            patientFile[i]["Url"])),
-                                // CachedNetworkImage(
-                                //   imageUrl: patientFile[i]["Url"],
-                                // ),
+                                    : ListView.builder(
+                                        shrinkWrap: true,
+                                        physics: NeverScrollableScrollPhysics(),
+                                        itemCount: patientFile[i]['Url'].length,
+                                        itemBuilder: (ctx, index) =>
+                                            GestureDetector(
+                                          onTap: () => Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (_) =>
+                                                    FullScreenFileViewer(
+                                                  tag: patientFile[i]["Url"]
+                                                      [index],
+                                                  url: patientFile[i]["Url"]
+                                                      [index],
+                                                ),
+                                              )),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(width: 3),
+                                            ),
+                                            child: Image(
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                              patientFile[i]["Url"][index],
+                                            )),
+                                          ),
+                                        ),
+                                      ),
                                 Column(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceEvenly,
@@ -394,10 +443,7 @@ class _PatientDetailScreenState extends State<PatientDetailScreen> {
           : IconButton(
               icon: Icon(Icons.keyboard_return),
               onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ManagePatients()),
-                );
+                Navigator.pop(context);
               }),
     );
   }
